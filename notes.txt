@@ -1,0 +1,1299 @@
+Yes. For Zeravynex, I’d build it as a production-style security engineering project, but in strict stages so you always have a working system.
+
+The key principle is:
+
+Build the malware-analysis engine first. Add ML second. Build the web application third. Add LLM features last.
+
+Final system architecture
+                         ZERAVYNEX
+          Explainable AI Malware Analysis Platform
+
+                              │
+                              ▼
+                       FILE SUBMISSION
+                              │
+                              ▼
+                  ┌──────────────────────┐
+                  │ Secure Upload Gateway│
+                  │                      │
+                  │ Size Validation      │
+                  │ File-Type Validation │
+                  │ SHA-256 Calculation  │
+                  │ Duplicate Detection  │
+                  └──────────┬───────────┘
+                             │
+                             ▼
+                   ┌──────────────────┐
+                   │ Analysis Worker  │
+                   │                  │
+                   │ PE Parser        │
+                   │ Strings          │
+                   │ Imports          │
+                   │ Sections         │
+                   │ Entropy          │
+                   │ Metadata         │
+                   └─────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              ▼              ▼              ▼
+
+        YARA ENGINE       ML ENGINE      IOC ENGINE
+
+        Rule Matches      Prediction     URLs
+        Signatures        Probability    Domains
+        Heuristics        SHAP Values    IP Addresses
+
+              │              │              │
+              └──────────────┼──────────────┘
+                             ▼
+
+                      RISK ENGINE
+
+               Evidence → Weighted Score
+                         → Verdict
+
+                             │
+                             ▼
+
+                      INCIDENT DATABASE
+
+                             │
+                             ▼
+
+                    AI ANALYST ENGINE
+
+                  Evidence Explanation
+                  ATT&CK Technique Mapping
+                  Investigation Guidance
+                  Report Generation
+
+                             │
+                             ▼
+
+                     REACT DASHBOARD
+Stage 0 — Project specification
+
+Duration: 2–3 days
+
+Do not start coding immediately.
+
+Define exactly what Zeravynex v1.0 does.
+
+Input
+Windows Portable Executable
+
+.exe
+.dll
+Output
+File Information
+
+SHA256
+MD5
+File Size
+File Type
+
+Static Analysis
+
+PE Headers
+Sections
+Imports
+Exports
+Strings
+Entropy
+
+Security Analysis
+
+Suspicious APIs
+Suspicious Strings
+YARA Matches
+Extracted IOCs
+
+Machine Learning
+
+Malware Probability
+Predicted Classification
+Model Confidence
+Feature Contributions
+
+Risk Analysis
+
+Risk Score
+Severity
+Evidence
+
+AI Analysis
+
+Executive Summary
+Technical Explanation
+Recommended Investigation Steps
+v1 restriction
+
+Uploaded files are never executed.
+
+This is critical.
+
+Zeravynex starts as a static malware analysis platform.
+
+Stage 1 — Learn the PE format
+
+Duration: 4–5 days
+
+Before building the detector, understand what you're analyzing.
+
+Learn:
+
+DOS Header
+    ↓
+PE Signature
+    ↓
+COFF Header
+    ↓
+Optional Header
+    ↓
+Data Directories
+    ↓
+Section Table
+    ↓
+.text
+.data
+.rdata
+.rsrc
+.reloc
+
+You should understand:
+
+ImageBase
+AddressOfEntryPoint
+Subsystem
+Characteristics
+DLLCharacteristics
+section permissions
+virtual size vs raw size
+Import Address Table
+exports
+
+Use pefile initially.
+
+Build small Python scripts:
+
+01_file_hash.py
+
+02_pe_headers.py
+
+03_sections.py
+
+04_imports.py
+
+05_strings.py
+
+06_entropy.py
+Milestone
+
+You can run:
+
+python analyze.py sample.exe
+
+and receive:
+
+File: sample.exe
+
+SHA256:
+40F03...
+
+Architecture:
+AMD64
+
+Sections:
+.text
+.rdata
+.data
+
+Imports:
+kernel32.dll
+user32.dll
+
+Entropy:
+6.41
+
+At this point, GitHub already contains a usable CLI project.
+
+Stage 2 — Build the Static Analysis Engine
+
+Duration: 1 week
+
+Now convert your scripts into a proper Python package.
+
+zeravynex/
+
+backend/
+
+    analyzer/
+
+        hashing.py
+
+        file_type.py
+
+        pe_parser.py
+
+        sections.py
+
+        imports.py
+
+        exports.py
+
+        strings.py
+
+        entropy.py
+
+        ioc_extractor.py
+
+        suspicious_api.py
+
+        analyzer.py
+
+Create the central interface:
+
+result = analyzer.analyze(file_path)
+
+Output:
+
+{
+    "file": {},
+
+    "pe": {},
+
+    "sections": [],
+
+    "imports": [],
+
+    "exports": [],
+
+    "strings": {},
+
+    "iocs": {},
+
+    "indicators": []
+}
+Features
+
+Implement:
+
+Hashing
+
+MD5
+SHA1
+SHA256
+
+PE metadata
+
+Architecture
+Compile Timestamp
+Entry Point
+Image Base
+Subsystem
+Section Count
+
+Section analysis
+
+Name
+Entropy
+Raw Size
+Virtual Size
+
+Readable
+Writable
+Executable
+
+Import analysis
+
+Detect APIs such as:
+
+VirtualAlloc
+
+VirtualProtect
+
+WriteProcessMemory
+
+CreateRemoteThread
+
+OpenProcess
+
+WinExec
+
+ShellExecute
+
+URLDownloadToFile
+
+InternetOpen
+
+InternetConnect
+
+RegSetValue
+
+CreateService
+
+Do not automatically label a file malware because it imports these functions.
+
+They are security indicators.
+
+Context matters.
+
+Milestone
+zeravynex analyze sample.exe
+
+produces:
+
+analysis.json
+Stage 3 — Build the Detection Engine
+
+Duration: 1 week
+
+Before ML, build deterministic detection.
+
+Architecture:
+
+Indicators
+     │
+     ▼
+Detection Rules
+     │
+     ▼
+Evidence
+     │
+     ▼
+Risk Score
+     │
+     ▼
+Verdict
+
+Example rules:
+
+HIGH_ENTROPY_SECTION
+
+RWX_SECTION
+
+SUSPICIOUS_PROCESS_INJECTION_APIS
+
+NETWORK_DOWNLOAD_APIS
+
+POWERSHELL_STRINGS
+
+EMBEDDED_URLS
+
+SUSPICIOUS_REGISTRY_ACCESS
+
+PACKER_INDICATORS
+
+Each rule produces:
+
+{
+    "rule": "RWX_SECTION",
+
+    "severity": "HIGH",
+
+    "confidence": 0.90,
+
+    "evidence": {
+        "section": ".xyz"
+    }
+}
+
+Build a weighted risk engine.
+
+INFO        1
+
+LOW         5
+
+MEDIUM      15
+
+HIGH        30
+
+CRITICAL    50
+
+Then normalize:
+
+0 ───────────── 100
+
+0-20      CLEAN/LOW RISK
+
+21-40     SUSPICIOUS
+
+41-70     HIGH RISK
+
+71-100    CRITICAL
+Milestone
+
+Zeravynex can detect suspicious binaries without ML.
+
+This is important because your ML model becomes another detection signal rather than the entire product.
+
+Stage 4 — Add YARA
+
+Duration: 4–5 days
+
+Integrate YARA.
+
+Repository:
+
+rules/
+
+    packers/
+
+    suspicious_apis/
+
+    malware_families/
+
+    webshells/
+
+    generic/
+
+    experimental/
+
+Build:
+
+YARA Rule Loader
+
+        ↓
+
+Rule Compiler
+
+        ↓
+
+File Scanner
+
+        ↓
+
+Normalized Matches
+
+Store:
+
+Rule Name
+
+Namespace
+
+Tags
+
+Metadata
+
+Matched Strings
+Milestone
+Static Analysis
+       +
+Heuristics
+       +
+YARA Detection
+
+You now have a legitimate malware-analysis engine.
+
+Stage 5 — Build the ML Dataset Pipeline
+
+Duration: 1–2 weeks
+
+This is one of the most important stages.
+
+Do not download random malware onto your normal machine.
+
+Start with established datasets containing extracted PE features, such as EMBER.
+
+Build:
+
+datasets/
+
+experiments/
+
+feature_pipeline/
+
+    extractor.py
+
+    schema.py
+
+    transformer.py
+
+    validator.py
+
+Feature vector:
+
+GENERAL
+
+file_size
+
+virtual_size
+
+number_sections
+
+number_imports
+
+number_exports
+
+
+ENTROPY
+
+mean_entropy
+
+max_entropy
+
+min_entropy
+
+
+SECTIONS
+
+executable_sections
+
+writable_sections
+
+rwx_sections
+
+
+IMPORTS
+
+suspicious_api_count
+
+network_api_count
+
+process_api_count
+
+registry_api_count
+
+
+STRINGS
+
+url_count
+
+ip_count
+
+powershell_count
+
+registry_string_count
+
+Very important:
+
+Your training feature extractor and production feature extractor should use the same schema.
+
+Otherwise:
+
+Training-Serving Skew
+
+will destroy model reliability.
+
+Stage 6 — Train the Malware Classifier
+
+Duration: 1 week
+
+Start simple.
+
+Logistic Regression
+        ↓
+Random Forest
+        ↓
+XGBoost / LightGBM
+
+Evaluate:
+
+Precision
+
+Recall
+
+F1 Score
+
+ROC-AUC
+
+PR-AUC
+
+Confusion Matrix
+
+False Positive Rate
+
+False Negative Rate
+
+Do not optimize only for accuracy.
+
+Example:
+
+Dataset
+
+95% malware
+5% benign
+
+Model predicts MALWARE every time.
+
+Accuracy = 95%
+
+Completely useless detector.
+
+Explainability
+
+Add SHAP.
+
+Output:
+
+Prediction
+
+MALWARE
+
+Probability
+
+0.94
+
+
+TOP MODEL FEATURES
+
+max_section_entropy        +0.17
+
+suspicious_api_count       +0.14
+
+rwx_section_count          +0.12
+
+number_imports             +0.08
+Milestone
+features.json
+
+      ↓
+
+ML Model
+
+      ↓
+
+Prediction
+
+      ↓
+
+SHAP Explanation
+Stage 7 — Build the Decision Fusion Engine
+
+Duration: 4–5 days
+
+This is where Zeravynex becomes interesting.
+
+You have:
+
+Static Heuristics
+
+YARA
+
+ML Model
+
+IOC Indicators
+
+Combine them.
+
+                HEURISTICS
+                    │
+
+YARA ─────────► DECISION ENGINE ◄───────── ML
+
+                    │
+
+                   IOC
+                    │
+                    ▼
+
+                VERDICT
+
+Example:
+
+Heuristic Risk       67/100
+
+YARA Confidence      90/100
+
+ML Probability       94/100
+
+IOC Risk             40/100
+
+Final:
+
+ZERAVYNEX RISK SCORE
+
+███████████████████░
+
+89 / 100
+
+
+VERDICT
+
+HIGHLY SUSPICIOUS
+
+Do not simply calculate:
+
+(score1 + score2 + score3) / 3
+
+Design a configurable scoring policy.
+
+For example:
+
+ML             35%
+
+Heuristics     30%
+
+YARA           25%
+
+IOC             10%
+
+Later you can calibrate these weights experimentally.
+
+Stage 8 — Build the Backend API
+
+Duration: 1 week
+
+Use FastAPI.
+
+Architecture:
+
+frontend
+
+     │
+
+     ▼
+
+API Gateway
+
+     │
+
+     ├── Authentication
+
+     ├── File Submission
+
+     ├── Analysis Jobs
+
+     ├── Reports
+
+     ├── Search
+
+     ▼
+
+PostgreSQL
+
+     │
+
+     ▼
+
+Analysis Workers
+
+Endpoints:
+
+POST   /api/v1/files
+
+POST   /api/v1/analyses
+
+GET    /api/v1/analyses/{id}
+
+GET    /api/v1/analyses
+
+GET    /api/v1/files/{sha256}
+
+GET    /api/v1/reports/{id}
+
+GET    /api/v1/dashboard/statistics
+
+Add:
+
+Request validation
+
+Rate limiting
+
+File size limits
+
+Upload timeouts
+
+Authentication
+
+RBAC
+
+Structured logging
+
+Global error handling
+Stage 9 — PostgreSQL Database
+
+Duration: 3–4 days
+
+Core schema:
+
+USERS
+
+id
+email
+password_hash
+role
+created_at
+
+
+FILES
+
+id
+sha256
+sha1
+md5
+size
+file_type
+first_seen
+
+
+ANALYSES
+
+id
+file_id
+user_id
+status
+risk_score
+verdict
+model_version
+created_at
+
+
+INDICATORS
+
+id
+analysis_id
+indicator_type
+severity
+confidence
+evidence
+
+
+YARA_MATCHES
+
+id
+analysis_id
+rule_name
+namespace
+metadata
+
+
+ML_PREDICTIONS
+
+id
+analysis_id
+model_version
+probability
+prediction
+
+
+REPORTS
+
+id
+analysis_id
+summary
+created_at
+Milestone
+
+The complete backend is functional.
+
+Stage 10 — Add Background Workers
+
+Duration: 3–5 days
+
+Analysis should not happen inside the HTTP request.
+
+Bad:
+
+Upload
+
+HTTP Request waits 30 seconds
+
+Analysis finishes
+
+Response
+
+Better:
+
+UPLOAD
+
+   ↓
+
+API
+
+   ↓
+
+JOB QUEUE
+
+   ↓
+
+WORKER
+
+   ↓
+
+ANALYSIS
+
+   ↓
+
+DATABASE
+
+   ↓
+
+FRONTEND POLLING / SSE
+
+Use Celery + Redis.
+
+Job states:
+
+QUEUED
+
+VALIDATING
+
+EXTRACTING_FEATURES
+
+RUNNING_YARA
+
+RUNNING_ML
+
+CALCULATING_RISK
+
+GENERATING_REPORT
+
+COMPLETED
+
+FAILED
+Stage 11 — Build the React Dashboard
+
+Duration: 1–2 weeks
+
+Pages:
+
+/login
+
+/dashboard
+
+/submit
+
+/analyses
+
+/analysis/:id
+
+/files/:sha256
+
+/rules
+
+/models
+
+/settings
+
+The most important page:
+
+ANALYSIS INVESTIGATION PAGE
+
+Layout:
+
+┌──────────────────────────────────────────────┐
+
+ FILE
+
+ invoice.exe
+
+ SHA256: 8a5f...
+
+ VERDICT: HIGHLY SUSPICIOUS
+
+ RISK: 89/100
+
+└──────────────────────────────────────────────┘
+
+
+┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+
+ ML SCORE        YARA MATCHES      INDICATORS
+
+ 94%             3                 12
+
+└──────────────┘ └──────────────┘ └──────────────┘
+
+
+WHY FLAGGED?
+
+High Entropy                 HIGH
+
+RWX Section                  CRITICAL
+
+Process Injection APIs       CRITICAL
+
+PowerShell Strings           HIGH
+
+
+MODEL EXPLANATION
+
+SHAP Feature Contribution Chart
+
+
+SECTIONS
+
+IMPORTS
+
+STRINGS
+
+IOCs
+
+YARA MATCHES
+Stage 12 — Add the AI Analyst
+
+Duration: 4–7 days
+
+Now add the LLM.
+
+Input:
+
+Structured Analysis Result
+
+Risk Evidence
+
+YARA Matches
+
+ML Explanation
+
+Extracted IOCs
+
+Output:
+
+Executive Summary
+
+Technical Analysis
+
+Why the File Was Flagged
+
+Potential ATT&CK Techniques
+
+Recommended Investigation Steps
+
+The LLM must never determine the malware verdict.
+
+Use:
+
+Detection Systems
+
+        ↓
+
+Structured Evidence
+
+        ↓
+
+LLM
+
+        ↓
+
+Explanation
+
+not:
+
+Binary
+
+ ↓
+
+LLM
+
+ ↓
+
+Malware Verdict
+Stage 13 — Security Hardening
+
+Duration: 1 week
+
+This stage makes the project professionally credible.
+
+Implement:
+
+file-type verification;
+upload size limits;
+randomized internal filenames;
+SHA-256 duplicate detection;
+analysis timeouts;
+worker isolation;
+container resource limits;
+read-only filesystems where practical;
+non-root containers;
+automatic file deletion;
+secrets through environment variables;
+audit logs;
+authentication;
+RBAC;
+rate limiting.
+
+Never expose uploaded binaries through public static URLs.
+
+Stage 14 — Testing
+
+Duration: 4–7 days
+
+UNIT TESTS
+
+Hashing
+
+Entropy
+
+PE Parsing
+
+Feature Extraction
+
+Risk Scoring
+
+Rule Engine
+
+
+INTEGRATION TESTS
+
+Upload → Analysis
+
+Database
+
+Worker Jobs
+
+API
+
+
+ML TESTS
+
+Feature Schema
+
+Model Loading
+
+Prediction Shape
+
+Probability Range
+
+Feature Drift Checks
+
+
+SECURITY TESTS
+
+Invalid PE
+
+Oversized Files
+
+Malformed Files
+
+Zip Bomb Protection
+
+Path Traversal Attempts
+Stage 15 — Docker + CI/CD
+
+Duration: 3–5 days
+
+Final infrastructure:
+
+docker-compose.yml
+
+frontend
+
+api
+
+worker
+
+postgres
+
+redis
+
+CI pipeline:
+
+PUSH
+
+ ↓
+
+LINT
+
+ ↓
+
+UNIT TESTS
+
+ ↓
+
+SECURITY SCANS
+
+ ↓
+
+BUILD CONTAINERS
+
+ ↓
+
+INTEGRATION TESTS
+Stage 16 — GitHub Presentation
+
+Duration: 3–4 days
+
+Your repository should look like:
+
+zeravynex/
+
+├── backend/
+├── frontend/
+├── analyzer/
+├── ml/
+├── rules/
+├── workers/
+├── tests/
+├── datasets/
+├── experiments/
+├── docs/
+│   ├── architecture/
+│   ├── threat-model/
+│   ├── ml-evaluation/
+│   └── screenshots/
+│
+├── docker-compose.yml
+├── CONTRIBUTING.md
+├── SECURITY.md
+├── LICENSE
+├── CHANGELOG.md
+└── README.md
+
+Your README should show:
+
+ZERAVYNEX
+
+Explainable AI Malware Analysis Platform
+
+[Architecture Diagram]
+
+[Dashboard Screenshot]
+
+[Demo GIF]
+
+
+FEATURES
+
+Static PE Analysis
+
+Explainable ML Classification
+
+YARA Detection
+
+IOC Extraction
+
+Risk Scoring
+
+AI Analyst
+
+Investigation Dashboard
+
+
+QUICK START
+
+ARCHITECTURE
+
+ML METHODOLOGY
+
+SECURITY MODEL
+
+API DOCUMENTATION
+
+ROADMAP
+The realistic development timeline
+Phase	Duration	Result
+PE Fundamentals	1 week	Understand binaries
+Static Analyzer	1 week	CLI analyzer
+Detection + YARA	2 weeks	Security engine
+Dataset + ML	2–3 weeks	Malware classifier
+Decision Engine	1 week	Unified verdict
+Backend + Database	2 weeks	Functional API
+Workers	1 week	Async analysis
+Frontend	2 weeks	Investigation dashboard
+AI Analyst	1 week	Explainable reports
+Hardening + Tests	1–2 weeks	Reliable system
+DevOps + Documentation	1 week	GitHub-ready release
+
+Realistic total: 14–17 weeks at 2–3 hours/day.
+
+If your vacation is only around 8 weeks, don't attempt the entire architecture.
+
+Build Zeravynex v0.1:
+
+Static PE Analyzer → Detection Rules → YARA → ML Classifier → Risk Engine → FastAPI → Simple React Dashboard → Docker → Tests → Excellent README
+
+That scope is already a substantial portfolio project.
+
+My strongest recommendation is that we start Stage 0 now and design the exact Zeravynex v0.1 specification, GitHub issue backlog, repository structure, and first 7 days of implementation tasks before writing code.
