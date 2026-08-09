@@ -1,5 +1,5 @@
 import time
-from typing import Dict, Any, Union
+from typing import Dict, Any, Union, Optional
 from pathlib import Path
 
 from .hashing import Hasher
@@ -8,13 +8,17 @@ from .sections import SectionAnalyzer
 from .imports_exports import ImportsExportsAnalyzer
 from .strings import StringExtractor
 from .ioc_extractor import IOCExtractor
+from app.engines.heuristic_engine import HeuristicEngine
+from app.engines.yara_engine import YARAEngine
+from app.engines.risk_engine import RiskEngine
 
 
 class StaticAnalyzer:
-    """Central Static Analysis Engine for Zeravynex (Phase 1)."""
+    """Central Analysis Engine for Zeravynex (Static PE Analysis, Heuristics, YARA & Risk Scoring)."""
 
-    def __init__(self, min_string_length: int = 4):
+    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None):
         self.min_string_length = min_string_length
+        self.yara_engine = YARAEngine(rules_dir=yara_rules_dir)
 
     def analyze(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         path = Path(file_path)
@@ -43,14 +47,11 @@ class StaticAnalyzer:
         # 6. IOC Extraction from Strings
         iocs = IOCExtractor.extract_iocs(strings_info.get("sample_strings", []))
 
-        analysis_duration = round(time.time() - start_time, 4)
-
-        # 7. Collect High-Level Security Indicators
+        # 7. High-Level Security Indicators
         indicators = []
         if not pe_info.get("is_pe"):
             indicators.append({"type": "WARNING", "message": pe_info.get("error", "Non-PE file submitted")})
         else:
-            # Check RWX sections
             rwx_sections = [s["name"] for s in sections if s.get("is_rwx")]
             if rwx_sections:
                 indicators.append({
@@ -59,7 +60,6 @@ class StaticAnalyzer:
                     "message": f"Found {len(rwx_sections)} Read-Write-Execute (RWX) section(s): {', '.join(rwx_sections)}"
                 })
 
-            # High entropy section
             high_entropy_sections = [s["name"] for s in sections if s.get("entropy", 0) >= 7.1]
             if high_entropy_sections:
                 indicators.append({
@@ -68,7 +68,6 @@ class StaticAnalyzer:
                     "message": f"High entropy (>= 7.1) in section(s): {', '.join(high_entropy_sections)}"
                 })
 
-            # Suspicious APIs
             susp_apis = imports_exports.get("suspicious_apis", [])
             if susp_apis:
                 indicators.append({
@@ -77,7 +76,6 @@ class StaticAnalyzer:
                     "message": f"Imported {len(susp_apis)} suspicious WinAPI function(s) (e.g., {', '.join([a['api'] for a in susp_apis[:3]])})"
                 })
 
-            # Suspicious string keywords
             kw_matches = strings_info.get("suspicious_keyword_matches", [])
             if kw_matches:
                 indicators.append({
@@ -86,16 +84,7 @@ class StaticAnalyzer:
                     "message": f"Matched {len(kw_matches)} suspicious keyword pattern(s) in binary strings"
                 })
 
-        return {
-            "metadata": {
-                "file_name": path.name,
-                "file_path": str(path.resolve()),
-                "analysis_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                "analysis_duration_seconds": analysis_duration,
-                "engine_version": "Zeravynex Phase 1 v1.0.0"
-            },
-            "hashes": hash_info,
-            "pe_header": pe_info,
+        partial_report = {
             "sections": sections,
             "imports_exports": imports_exports,
             "strings_summary": {
@@ -105,6 +94,43 @@ class StaticAnalyzer:
                 "entropy": strings_info.get("strings_entropy", 0.0),
                 "suspicious_keyword_matches": strings_info.get("suspicious_keyword_matches", [])
             },
+            "iocs": iocs
+        }
+
+        # 8. Phase 2: Deterministic Heuristic Engine
+        heuristic_matches = HeuristicEngine.evaluate(partial_report)
+
+        # 9. Phase 2: YARA Scanner Engine
+        yara_report = self.yara_engine.scan_file(path)
+
+        # 10. Phase 2: Risk Engine Computation
+        risk_summary = RiskEngine.calculate_risk(
+            heuristic_matches=heuristic_matches,
+            yara_matches=yara_report.get("matches", []),
+            static_indicators=indicators
+        )
+
+        analysis_duration = round(time.time() - start_time, 4)
+
+        return {
+            "metadata": {
+                "file_name": path.name,
+                "file_path": str(path.resolve()),
+                "analysis_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "analysis_duration_seconds": analysis_duration,
+                "engine_version": "Zeravynex Phase 1+2 v1.2.0"
+            },
+            "risk_analysis": risk_summary,
+            "heuristic_analysis": {
+                "total_heuristic_matches": len(heuristic_matches),
+                "matches": heuristic_matches
+            },
+            "yara_analysis": yara_report,
+            "hashes": hash_info,
+            "pe_header": pe_info,
+            "sections": sections,
+            "imports_exports": imports_exports,
+            "strings_summary": partial_report["strings_summary"],
             "iocs": iocs,
             "indicators": indicators
         }

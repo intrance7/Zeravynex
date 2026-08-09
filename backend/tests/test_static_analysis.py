@@ -15,12 +15,13 @@ from app.engines.static_analysis.imports_exports import ImportsExportsAnalyzer, 
 from app.engines.static_analysis.strings import StringExtractor
 from app.engines.static_analysis.ioc_extractor import IOCExtractor
 from app.engines.static_analysis.analyzer import StaticAnalyzer
+from app.engines.heuristic_engine import HeuristicEngine
+from app.engines.yara_engine import YARAEngine
+from app.engines.risk_engine import RiskEngine
 
 
 def test_entropy_calculation():
-    # Constant data -> entropy should be 0.0
     assert calculate_entropy(b"AAAAAAA") == 0.0
-    # Uniform 256 byte data -> max entropy ~ 8.0
     full_byte_array = bytes(range(256))
     assert calculate_entropy(full_byte_array) == 8.0
 
@@ -77,16 +78,63 @@ def test_ioc_extractor():
     assert "Global\\ZeravynexTestMutex" in iocs["mutexes"]
 
 
-def test_end_to_end_static_analyzer(tmp_path):
-    dummy_pe = tmp_path / "dummy.exe"
-    dummy_pe.write_bytes(b"MZ" + b"\x00" * 500 + b"https://evil.com/drop.exe HKLM\\Software\\Run")
+def test_heuristic_engine():
+    dummy_report = {
+        "sections": [{"name": ".text", "is_rwx": True, "entropy": 7.5}],
+        "imports_exports": {
+            "suspicious_apis": [
+                {"api": "VirtualAllocEx", "category": "Process Injection & Execution"},
+                {"api": "WriteProcessMemory", "category": "Process Injection & Execution"}
+            ]
+        },
+        "strings_summary": {
+            "suspicious_keyword_matches": [{"string": "YOUR FILES HAVE BEEN ENCRYPTED", "category": "Ransomware Indicators"}]
+        },
+        "iocs": {"urls": ["http://evil.com/c2"]}
+    }
+    matches = HeuristicEngine.evaluate(dummy_report)
+    assert len(matches) >= 3
+    rule_ids = [m["rule_id"] for m in matches]
+    assert "HEUR_RWX_SECTION" in rule_ids
+    assert "HEUR_RANSOMWARE_STRINGS" in rule_ids
+
+
+def test_yara_engine(tmp_path):
+    upx_binary = tmp_path / "upx_sample.exe"
+    upx_binary.write_bytes(b"MZ" + b"\x00" * 100 + b"UPX0" + b"\x00" * 50 + b"UPX1")
+
+    engine = YARAEngine()
+    scan_res = engine.scan_file(upx_binary)
+    assert "matches" in scan_res
+    matched_rules = [m["rule"] for m in scan_res["matches"]]
+    assert "UPX_Packed_Binary" in matched_rules
+
+
+def test_risk_engine():
+    heur_matches = [
+        {"rule_name": "RWX Section", "severity": "HIGH", "weight": 30},
+        {"rule_name": "Ransom Note", "severity": "CRITICAL", "weight": 50}
+    ]
+    risk = RiskEngine.calculate_risk(heur_matches, [], [])
+    assert risk["risk_score"] == 80
+    assert risk["verdict"] == "CRITICAL MALWARE"
+
+
+def test_phase2_end_to_end(tmp_path):
+    sample = tmp_path / "malicious.exe"
+    sample.write_bytes(
+        b"MZ" + b"\x00" * 100 +
+        b"UPX0\x00UPX1\x00" +
+        b"vssadmin delete shadows\x00" +
+        b"VirtualAllocEx\x00WriteProcessMemory\x00CreateRemoteThread\x00" +
+        b"http://attacker-c2.org/drop.exe"
+    )
 
     analyzer = StaticAnalyzer()
-    report = analyzer.analyze(dummy_pe)
+    report = analyzer.analyze(sample)
 
-    assert "metadata" in report
-    assert "hashes" in report
-    assert "pe_header" in report
-    assert "iocs" in report
-    assert "indicators" in report
-    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase 1")
+    assert "risk_analysis" in report
+    assert "heuristic_analysis" in report
+    assert "yara_analysis" in report
+    assert report["risk_analysis"]["risk_score"] > 20
+    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase 1+2")
