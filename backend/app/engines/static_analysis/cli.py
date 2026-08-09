@@ -46,7 +46,7 @@ def main():
         print(f"Sections    : {len(result['sections'])}")
         print(f"Imports     : {result['imports_exports']['total_imported_functions']} functions from {len(result['imports_exports']['imports'])} DLLs")
 
-    print(f"\n[🤖] ML Model & SHAP Explainability:")
+    print(f"\n[ML] Model & SHAP Explainability:")
     print(f"    - Architecture : {ml.get('architecture')}")
     print(f"    - ML Summary   : {shap.get('explanation_summary')}")
     print(f"    - Top Pushers  :")
