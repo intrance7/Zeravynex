@@ -52,21 +52,23 @@ Zeravynex development is structured into clear, incremental phases to ensure a r
 | **Phase 0** | **Project Specification** | System architecture, risk model, and technology stack definition | ✅ Complete |
 | **Phase 1** | **Malware Analysis Engine** | PE parsing, section entropy, import/export analysis, string extraction, IOC extractor & CLI interface | ✅ Complete |
 | **Phase 2** | **Heuristics & YARA Engine** | Deterministic security rules, YARA rule scanner, and evidence-weighted risk scoring | ✅ Complete |
-| **Phase 3** | **Machine Learning & Explainability** | Feature extraction schema, dataset pipeline, XGBoost classifier, and SHAP explanations | 🔄 **In Progress** |
-| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | 🔲 Planned |
+| **Phase 3** | **Machine Learning & Explainability** | Feature extraction schema, dataset pipeline, XGBoost classifier, and SHAP explanations | ✅ Complete |
+| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | 🔄 **In Progress** |
 | **Phase 5** | **Backend API & Task Queue** | FastAPI REST endpoints, background analysis worker queue, and SQLite/Postgres persistence | 🔲 Planned |
 | **Phase 6** | **AI Analyst Engine** | LLM-based narrative generation, MITRE ATT&CK mapping, and automated threat recommendations | 🔲 Planned |
 | **Phase 7** | **Web & Desktop Applications** | React + TypeScript dashboard with Recharts visualizations and optional Tauri desktop shell | 🔲 Planned |
 
 ---
 
-## Phase 1 & 2 Completed Features
+## Phase 1, 2 & 3 Completed Features
 
 - [x] **Static PE Analyzer**: Hasher (`MD5`, `SHA1`, `SHA256`, entropy), PE Header, Section Permissions (`RWX`), Import/Export IAT categorizer, ASCII/Unicode String Extractor, IOC Extractor (`URLs`, `IPs`, `Domains`, `Registry Keys`, `Mutexes`)
 - [x] **Deterministic Heuristic Engine**: Behavioral rule matches for Process Injection, High Entropy Packers, Ransomware notes, Persistence, C2 Infrastructure
 - [x] **YARA Scanner Engine**: Signature scanner for UPX packers, generic high entropy signatures, injection primitives, ransomware notes
 - [x] **Weighted Risk Engine**: 0–100 normalized risk score calculation & automated threat verdict (`CLEAN / LOW RISK`, `SUSPICIOUS`, `HIGH RISK`, `CRITICAL MALWARE`)
-- [x] **CLI Tool & Test Suite**: `python -m app.engines.static_analysis.cli <file>` and 100% passing pytest test suite (`backend/tests/test_static_analysis.py`)
+- [x] **ML Classifier & Feature Extractor**: 25D PE feature vector extractor (`PEFeatureExtractor`) and calibrated `RandomForestClassifier` predicting malware probability & confidence
+- [x] **SHAP Explainability Engine**: SHAP feature attribution calculator (`SHAPExplainer`) highlighting top malware feature pushers vs benign feature pushers
+- [x] **CLI Tool & Test Suite**: `python -m app.engines.static_analysis.cli <file>` and complete test suite (`backend/tests/`)
 
 ## Tech Stack
 

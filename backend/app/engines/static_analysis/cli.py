@@ -8,7 +8,7 @@ from .analyzer import StaticAnalyzer
 def main():
     parser = argparse.ArgumentParser(
         prog="Zeravynex Static Analyzer",
-        description="Phase 1 & 2 Static Malware Analysis & Threat Detection Engine for PE Binaries"
+        description="Zeravynex Static Malware Analysis, Threat Detection & ML Explainability Engine"
     )
     parser.add_argument("file_path", type=str, help="Path to the binary file (.exe, .dll, etc.) to analyze")
     parser.add_argument("-o", "--output", type=str, default=None, help="Path to save JSON analysis output file")
@@ -26,10 +26,13 @@ def main():
     result = analyzer.analyze(file_path)
 
     risk = result.get("risk_analysis", {})
+    ml = result.get("ml_analysis", {})
+    shap = ml.get("shap_explainability", {})
 
     print(f"\n================ ZERAVYNEX THREAT ANALYSIS ==================")
     print(f"VERDICT     : {risk.get('verdict', 'UNKNOWN')}")
     print(f"RISK SCORE  : {risk.get('risk_score', 0)} / 100 [{risk.get('severity_level', 'INFO')}]")
+    print(f"ML PREDICT  : {ml.get('prediction', 'UNKNOWN')} (Probability: {ml.get('malware_probability', 0.0)*100:.1f}%)")
     print(f"File Name   : {result['metadata']['file_name']}")
     print(f"SHA256      : {result['hashes']['sha256']}")
     print(f"File Size   : {result['hashes']['size_bytes']} bytes")
@@ -42,6 +45,13 @@ def main():
         print(f"Compile Time: {result['pe_header']['compile_timestamp']}")
         print(f"Sections    : {len(result['sections'])}")
         print(f"Imports     : {result['imports_exports']['total_imported_functions']} functions from {len(result['imports_exports']['imports'])} DLLs")
+
+    print(f"\n[🤖] ML Model & SHAP Explainability:")
+    print(f"    - Architecture : {ml.get('architecture')}")
+    print(f"    - ML Summary   : {shap.get('explanation_summary')}")
+    print(f"    - Top Pushers  :")
+    for pusher in shap.get("top_malware_indicators", [])[:3]:
+        print(f"      + {pusher['feature_name']} = {pusher['feature_value']} (SHAP: +{pusher['shap_value']:.4f})")
 
     print(f"\n[!] Heuristic Rule Matches ({result['heuristic_analysis']['total_heuristic_matches']}):")
     for match in result['heuristic_analysis']['matches']:

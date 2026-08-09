@@ -11,14 +11,18 @@ from .ioc_extractor import IOCExtractor
 from app.engines.heuristic_engine import HeuristicEngine
 from app.engines.yara_engine import YARAEngine
 from app.engines.risk_engine import RiskEngine
+from app.engines.ml.classifier import MalwareClassifier
+from app.engines.ml.explainer import SHAPExplainer
 
 
 class StaticAnalyzer:
-    """Central Analysis Engine for Zeravynex (Static PE Analysis, Heuristics, YARA & Risk Scoring)."""
+    """Central Analysis Engine for Zeravynex (Static Analysis, Heuristics, YARA, ML Classification & SHAP Explainability)."""
 
-    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None):
+    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None, model_path: Optional[Union[str, Path]] = None):
         self.min_string_length = min_string_length
         self.yara_engine = YARAEngine(rules_dir=yara_rules_dir)
+        self.classifier = MalwareClassifier(model_path=model_path)
+        self.explainer = SHAPExplainer(classifier_model=self.classifier.rf_model)
 
     def analyze(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         path = Path(file_path)
@@ -85,6 +89,8 @@ class StaticAnalyzer:
                 })
 
         partial_report = {
+            "hashes": hash_info,
+            "pe_header": pe_info,
             "sections": sections,
             "imports_exports": imports_exports,
             "strings_summary": {
@@ -99,6 +105,10 @@ class StaticAnalyzer:
 
         # 8. Phase 2: Deterministic Heuristic Engine
         heuristic_matches = HeuristicEngine.evaluate(partial_report)
+        partial_report["heuristic_analysis"] = {
+            "total_heuristic_matches": len(heuristic_matches),
+            "matches": heuristic_matches
+        }
 
         # 9. Phase 2: YARA Scanner Engine
         yara_report = self.yara_engine.scan_file(path)
@@ -110,6 +120,10 @@ class StaticAnalyzer:
             static_indicators=indicators
         )
 
+        # 11. Phase 3: Machine Learning & SHAP Explainability Engine
+        ml_pred = self.classifier.predict(partial_report)
+        shap_explanation = self.explainer.explain(ml_pred)
+
         analysis_duration = round(time.time() - start_time, 4)
 
         return {
@@ -118,13 +132,18 @@ class StaticAnalyzer:
                 "file_path": str(path.resolve()),
                 "analysis_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "analysis_duration_seconds": analysis_duration,
-                "engine_version": "Zeravynex Phase 1+2 v1.2.0"
+                "engine_version": "Zeravynex Phase 1+2+3 v1.3.0"
             },
             "risk_analysis": risk_summary,
-            "heuristic_analysis": {
-                "total_heuristic_matches": len(heuristic_matches),
-                "matches": heuristic_matches
+            "ml_analysis": {
+                "prediction": ml_pred.get("prediction"),
+                "malware_probability": ml_pred.get("malware_probability"),
+                "benign_probability": ml_pred.get("benign_probability"),
+                "confidence": ml_pred.get("confidence"),
+                "architecture": ml_pred.get("model_architecture"),
+                "shap_explainability": shap_explanation
             },
+            "heuristic_analysis": partial_report["heuristic_analysis"],
             "yara_analysis": yara_report,
             "hashes": hash_info,
             "pe_header": pe_info,
