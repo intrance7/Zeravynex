@@ -43,15 +43,32 @@ FILE SUBMISSION → SECURE UPLOAD → ANALYSIS WORKER
 
 > ⚠️ **Uploaded files are never executed.** Zeravynex performs static analysis only.
 
-## Status
+## Project Roadmap & Phases
 
-| Stage | Description | Status |
-|-------|-------------|--------|
-| Stage 0 | Project Specification | ✅ Complete |
-| Stage 1 | Malware Analysis Engine | 🔲 Not Started |
-| Stage 2 | ML Engine | 🔲 Not Started |
-| Stage 3 | Web Application | 🔲 Not Started |
-| Stage 4 | AI Analyst Engine | 🔲 Not Started |
+Zeravynex development is structured into clear, incremental phases to ensure a robust, production-grade security architecture:
+
+| Phase | Phase Name | Description | Status |
+|-------|------------|-------------|--------|
+| **Phase 0** | **Project Specification** | System architecture, risk model, and technology stack definition | ✅ Complete |
+| **Phase 1** | **Malware Analysis Engine** | PE parsing, section entropy, import/export analysis, string extraction, IOC extractor & CLI interface | 🔄 **In Progress** |
+| **Phase 2** | **Heuristics & YARA Engine** | Deterministic security rules, YARA rule scanner, and evidence-weighted risk scoring | 🔲 Planned |
+| **Phase 3** | **Machine Learning & Explainability** | Feature extraction schema, dataset pipeline, XGBoost classifier, and SHAP explanations | 🔲 Planned |
+| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | 🔲 Planned |
+| **Phase 5** | **Backend API & Task Queue** | FastAPI REST endpoints, background analysis worker queue, and SQLite/Postgres persistence | 🔲 Planned |
+| **Phase 6** | **AI Analyst Engine** | LLM-based narrative generation, MITRE ATT&CK mapping, and automated threat recommendations | 🔲 Planned |
+| **Phase 7** | **Web & Desktop Applications** | React + TypeScript dashboard with Recharts visualizations and optional Tauri desktop shell | 🔲 Planned |
+
+---
+
+## Phase 1 Breakdown: Malware Analysis Engine
+
+- [x] **01_hashing.py / Hasher**: MD5, SHA1, SHA256, file size calculation
+- [x] **02_pe_parser.py**: DOS/COFF/Optional headers, Machine architecture, Subsystem, Compile timestamp, EntryPoint, ImageBase
+- [x] **03_sections.py**: Section names, Raw size vs Virtual size, Memory characteristics (Readable/Writable/Executable), Section entropy calculation
+- [x] **04_imports_exports.py**: Import table parsing, Export symbols, Suspicious API indicator tagging (Process Injection, Memory Manipulation, Network, Registry, Service management APIs)
+- [x] **05_strings.py**: ASCII and Wide (UTF-16LE) string extraction, minimum length filtering, entropy metrics
+- [x] **06_ioc_extractor.py**: Extraction of IPv4 addresses, Domains, URLs, Registry keys, File paths, and Mutex patterns
+- [x] **07_analyzer.py & CLI**: Central engine orchestrator producing normalized JSON reports and CLI runner (`zeravynex analyze <file>`)
 
 ## Tech Stack
 

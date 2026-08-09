@@ -1,0 +1,23 @@
+Technology stack
+Layer	Technology	Purpose
+Desktop Framework	Tauri	Creates the Windows desktop application
+Desktop Core	Rust	OS interaction, process management, secure IPC
+Frontend	React	UI architecture
+Language	TypeScript	Type-safe frontend development
+Build Tool	Vite	Frontend development and bundling
+Styling	Tailwind CSS	UI styling
+Components	shadcn/ui	Professional UI components
+Charts	Recharts	Detection and ML visualization
+Analysis Engine	Python	Malware analysis and ML ecosystem
+PE Parsing	pefile	Windows PE parsing
+Binary Parsing	LIEF	Advanced binary inspection
+Detection	YARA	Signature and rule-based detection
+ML	scikit-learn	Baseline malware classifier
+Advanced ML	XGBoost	Strong tabular classifier
+Explainability	SHAP	Explain model predictions
+Database	SQLite	Local analysis history
+ORM	SQLAlchemy	Database abstraction
+Packaging	PyInstaller	Packages Python analysis engine
+Installer	Tauri Bundler	Generates Windows installer
+Testing	Pytest + Vitest	Backend/frontend tests
+CI/CD	GitHub Actions	Automated builds and releases
