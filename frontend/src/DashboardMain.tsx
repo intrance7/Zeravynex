@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShieldAlert, CheckCircle, AlertTriangle, ShieldX } from 'lucide-react';
+import { ShieldAlert, CheckCircle, AlertTriangle, ShieldX, Activity, Database } from 'lucide-react';
 import { cn } from './lib/utils';
 import { motion } from 'framer-motion';
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 

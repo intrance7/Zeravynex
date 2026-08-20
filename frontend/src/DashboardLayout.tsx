@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
-  Shield, Activity, FileSearch, Database, Server, Settings, 
+  Shield, Activity, FileSearch, Database, Settings, 
   LogOut, User as UserIcon, Sun, Moon, Bell, ChevronRight 
 } from 'lucide-react';
 import { cn } from './lib/utils';
