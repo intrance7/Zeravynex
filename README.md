@@ -53,8 +53,8 @@ Zeravynex development is structured into clear, incremental phases to ensure a r
 | **Phase 1** | **Malware Analysis Engine** | PE parsing, section entropy, import/export analysis, string extraction, IOC extractor & CLI interface | ✅ Complete |
 | **Phase 2** | **Heuristics & YARA Engine** | Deterministic security rules, YARA rule scanner, and evidence-weighted risk scoring | ✅ Complete |
 | **Phase 3** | **Machine Learning & Explainability** | Feature extraction schema, dataset pipeline, XGBoost classifier, and SHAP explanations | ✅ Complete |
-| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | 🔄 **In Progress** |
-| **Phase 5** | **Backend API & Task Queue** | FastAPI REST endpoints, background analysis worker queue, and SQLite/Postgres persistence | 🔲 Planned |
+| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | ✅ Complete |
+| **Phase 5** | **Backend API & Task Queue** | FastAPI REST endpoints, background analysis worker queue, and SQLite persistence | ✅ Complete |
 | **Phase 6** | **AI Analyst Engine** | LLM-based narrative generation, MITRE ATT&CK mapping, and automated threat recommendations | 🔲 Planned |
 | **Phase 7** | **Web & Desktop Applications** | React + TypeScript dashboard with Recharts visualizations and optional Tauri desktop shell | 🔲 Planned |
 

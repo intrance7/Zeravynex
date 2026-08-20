@@ -10,7 +10,7 @@ from .strings import StringExtractor
 from .ioc_extractor import IOCExtractor
 from app.engines.heuristic_engine import HeuristicEngine
 from app.engines.yara_engine import YARAEngine
-from app.engines.risk_engine import RiskEngine
+from app.engines.decision_fusion import DecisionFusionEngine
 from app.engines.ml.classifier import MalwareClassifier
 from app.engines.ml.explainer import SHAPExplainer
 
@@ -18,11 +18,12 @@ from app.engines.ml.explainer import SHAPExplainer
 class StaticAnalyzer:
     """Central Analysis Engine for Zeravynex (Static Analysis, Heuristics, YARA, ML Classification & SHAP Explainability)."""
 
-    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None, model_path: Optional[Union[str, Path]] = None):
+    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None, model_path: Optional[Union[str, Path]] = None, fusion_policy: Dict[str, float] = None):
         self.min_string_length = min_string_length
         self.yara_engine = YARAEngine(rules_dir=yara_rules_dir)
         self.classifier = MalwareClassifier(model_path=model_path)
         self.explainer = SHAPExplainer(classifier_model=self.classifier.rf_model)
+        self.fusion_engine = DecisionFusionEngine(policy=fusion_policy)
 
     def analyze(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         path = Path(file_path)
@@ -113,16 +114,17 @@ class StaticAnalyzer:
         # 9. Phase 2: YARA Scanner Engine
         yara_report = self.yara_engine.scan_file(path)
 
-        # 10. Phase 2: Risk Engine Computation
-        risk_summary = RiskEngine.calculate_risk(
-            heuristic_matches=heuristic_matches,
-            yara_matches=yara_report.get("matches", []),
-            static_indicators=indicators
-        )
-
-        # 11. Phase 3: Machine Learning & SHAP Explainability Engine
+        # 10. Phase 3: Machine Learning & SHAP Explainability Engine
         ml_pred = self.classifier.predict(partial_report)
         shap_explanation = self.explainer.explain(ml_pred)
+
+        # 11. Phase 4: Decision Fusion Engine Computation
+        risk_summary = self.fusion_engine.fuse(
+            ml_prob=ml_pred.get("malware_probability", 0.0),
+            heuristic_matches=heuristic_matches,
+            yara_matches=yara_report.get("matches", []),
+            ioc_data=iocs
+        )
 
         analysis_duration = round(time.time() - start_time, 4)
 
@@ -132,7 +134,7 @@ class StaticAnalyzer:
                 "file_path": str(path.resolve()),
                 "analysis_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "analysis_duration_seconds": analysis_duration,
-                "engine_version": "Zeravynex Phase 1+2+3 v1.3.0"
+                "engine_version": "Zeravynex Phase 1+2+3+4 v1.4.0"
             },
             "risk_analysis": risk_summary,
             "ml_analysis": {
