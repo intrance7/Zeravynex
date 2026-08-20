@@ -108,4 +108,4 @@ def test_end_to_end_ml_analyzer(tmp_path):
     assert "ml_analysis" in report
     assert "malware_probability" in report["ml_analysis"]
     assert "shap_explainability" in report["ml_analysis"]
-    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase 1+2+3")
+    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase")

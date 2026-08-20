@@ -130,4 +130,4 @@ def test_phase2_end_to_end(tmp_path):
     assert "heuristic_analysis" in report
     assert "yara_analysis" in report
     assert report["risk_analysis"]["risk_score"] >= 0
-    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase 1+2+3+4")
+    assert report["metadata"]["engine_version"].startswith("Zeravynex Phase")

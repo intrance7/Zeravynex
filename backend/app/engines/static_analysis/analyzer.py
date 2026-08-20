@@ -11,19 +11,21 @@ from .ioc_extractor import IOCExtractor
 from app.engines.heuristic_engine import HeuristicEngine
 from app.engines.yara_engine import YARAEngine
 from app.engines.decision_fusion import DecisionFusionEngine
+from app.engines.ai_analyst import AIAnalystEngine
 from app.engines.ml.classifier import MalwareClassifier
 from app.engines.ml.explainer import SHAPExplainer
 
 
 class StaticAnalyzer:
-    """Central Analysis Engine for Zeravynex (Static Analysis, Heuristics, YARA, ML Classification & SHAP Explainability)."""
+    """Central Analysis Engine for Zeravynex (Static Analysis, Heuristics, YARA, ML Classification, SHAP & AI Analyst)."""
 
-    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None, model_path: Optional[Union[str, Path]] = None, fusion_policy: Dict[str, float] = None):
+    def __init__(self, min_string_length: int = 4, yara_rules_dir: Optional[Union[str, Path]] = None, model_path: Optional[Union[str, Path]] = None, fusion_policy: Dict[str, float] = None, ai_api_key: Optional[str] = None):
         self.min_string_length = min_string_length
         self.yara_engine = YARAEngine(rules_dir=yara_rules_dir)
         self.classifier = MalwareClassifier(model_path=model_path)
         self.explainer = SHAPExplainer(classifier_model=self.classifier.rf_model)
         self.fusion_engine = DecisionFusionEngine(policy=fusion_policy)
+        self.ai_analyst = AIAnalystEngine(api_key=ai_api_key)
 
     def analyze(self, file_path: Union[str, Path]) -> Dict[str, Any]:
         path = Path(file_path)
@@ -126,6 +128,23 @@ class StaticAnalyzer:
             ioc_data=iocs
         )
 
+        # 12. Phase 6: AI Analyst Engine & MITRE ATT&CK Mapping
+        interim_report = {
+            "file_info": {"file_name": path.name},
+            "hashes": hash_info,
+            "risk_analysis": risk_summary,
+            "heuristics": partial_report["heuristic_analysis"],
+            "yara_matches": yara_report.get("matches", []),
+            "iocs": iocs,
+            "imports": imports_exports,
+            "ml_analysis": {
+                "malware_probability": ml_pred.get("malware_probability"),
+                "confidence": ml_pred.get("confidence"),
+                "shap_explanation": shap_explanation
+            }
+        }
+        ai_summary = self.ai_analyst.analyze(interim_report)
+
         analysis_duration = round(time.time() - start_time, 4)
 
         return {
@@ -134,9 +153,10 @@ class StaticAnalyzer:
                 "file_path": str(path.resolve()),
                 "analysis_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
                 "analysis_duration_seconds": analysis_duration,
-                "engine_version": "Zeravynex Phase 1+2+3+4 v1.4.0"
+                "engine_version": "Zeravynex Phase 1-6 v1.6.0"
             },
             "risk_analysis": risk_summary,
+            "ai_analysis": ai_summary,
             "ml_analysis": {
                 "prediction": ml_pred.get("prediction"),
                 "malware_probability": ml_pred.get("malware_probability"),
