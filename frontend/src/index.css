@@ -34,6 +34,36 @@
 
     --radius: 0.5rem;
   }
+
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+
+    --card: 0 0% 98%;
+    --card-foreground: 240 10% 4%;
+
+    --popover: 0 0% 98%;
+    --popover-foreground: 240 10% 4%;
+
+    --primary: 217 91% 50%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 240 5% 90%;
+    --secondary-foreground: 240 10% 4%;
+
+    --muted: 240 5% 90%;
+    --muted-foreground: 240 5% 45%;
+
+    --accent: 217 91% 50%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84% 50%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 240 5% 85%;
+    --input: 240 5% 85%;
+    --ring: 217 91% 50%;
+  }
 }
 
 @layer base {
