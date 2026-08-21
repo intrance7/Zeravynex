@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+# pyrefly: ignore [missing-import]
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
