@@ -1,85 +1,195 @@
+<div align="center">
+
 # 🛡️ Zeravynex
 
-**Explainable AI Malware Analysis Platform**
+### **Explainable AI Static Malware Analysis Platform**
 
-Zeravynex is a static malware analysis platform that accepts Windows PE files (`.exe`, `.dll`), extracts deep structural and behavioral indicators, scores them with machine learning, and explains its reasoning with AI-powered narrative analysis.
+*Deep Structural Inspection • Machine Learning Triage • SHAP Explainability • Threat Intelligence*
 
----
+[![CI Pipeline](https://github.com/intrance7/Zeravynex/actions/workflows/ci.yml/badge.svg)](https://github.com/intrance7/Zeravynex/actions/workflows/ci.yml)
+[![CodeQL Security](https://github.com/intrance7/Zeravynex/actions/workflows/codeql.yml/badge.svg)](https://github.com/intrance7/Zeravynex/actions/workflows/codeql.yml)
+[![Python Version](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109+-009688?style=flat&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=flat&logo=react&logoColor=black)](https://reactjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=flat&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-## Features
+<br/>
 
-- **PE Static Analysis** — Headers, sections, imports, exports, strings, entropy
-- **YARA Engine** — Rule-based detection across ransomware, trojans, packers, and suspicious behaviors
-- **IOC Extraction** — URLs, domains, IPs, emails, registry keys, file paths, mutexes
-- **Machine Learning** — Malware probability with SHAP-based explainability
-- **Risk Scoring** — Evidence-weighted risk scores with severity classification
-- **AI Analyst** — LLM-powered executive summaries, ATT&CK mapping, investigation guidance
-- **React Dashboard** — Modern web interface with entropy charts, risk gauges, and SHAP visualizations
+[Key Features](#-key-features) • [System Architecture](#-system-architecture) • [Quickstart](#-quickstart) • [API Reference](#-api-reference) • [Roadmap](#-project-roadmap) • [Contributing](#-contributing)
 
-## Architecture
-
-```
-FILE SUBMISSION → SECURE UPLOAD → ANALYSIS WORKER
-                                       │
-                          ┌────────────┼────────────┐
-                          ▼            ▼            ▼
-                     YARA ENGINE  ML ENGINE    IOC ENGINE
-                          │            │            │
-                          └────────────┼────────────┘
-                                       ▼
-                                  RISK ENGINE
-                                       │
-                                       ▼
-                               INCIDENT DATABASE
-                                       │
-                                       ▼
-                              AI ANALYST ENGINE
-                                       │
-                                       ▼
-                               REACT DASHBOARD
-```
-
-## Safety
-
-> ⚠️ **Uploaded files are never executed.** Zeravynex performs static analysis only.
-
-## Project Roadmap & Phases
-
-Zeravynex development is structured into clear, incremental phases to ensure a robust, production-grade security architecture:
-
-| Phase | Phase Name | Description | Status |
-|-------|------------|-------------|--------|
-| **Phase 0** | **Project Specification** | System architecture, risk model, and technology stack definition | ✅ Complete |
-| **Phase 1** | **Malware Analysis Engine** | PE parsing, section entropy, import/export analysis, string extraction, IOC extractor & CLI interface | ✅ Complete |
-| **Phase 2** | **Heuristics & YARA Engine** | Deterministic security rules, YARA rule scanner, and evidence-weighted risk scoring | ✅ Complete |
-| **Phase 3** | **Machine Learning & Explainability** | Feature extraction schema, dataset pipeline, XGBoost classifier, and SHAP explanations | ✅ Complete |
-| **Phase 4** | **Decision Fusion Engine** | Multi-signal aggregation engine combining Heuristics, YARA, ML, and IOC score weights | ✅ Complete |
-| **Phase 5** | **Backend API & Task Queue** | FastAPI REST endpoints, background analysis worker queue, and SQLite persistence | ✅ Complete |
-| **Phase 6** | **AI Analyst Engine** | LLM-based narrative generation, MITRE ATT&CK mapping, and automated threat recommendations | 🔲 Planned |
-| **Phase 7** | **Web & Desktop Applications** | React + TypeScript dashboard with Recharts visualizations and optional Tauri desktop shell | 🔲 Planned |
+</div>
 
 ---
 
-## Phase 1, 2 & 3 Completed Features
+## 🌟 Overview
 
-- [x] **Static PE Analyzer**: Hasher (`MD5`, `SHA1`, `SHA256`, entropy), PE Header, Section Permissions (`RWX`), Import/Export IAT categorizer, ASCII/Unicode String Extractor, IOC Extractor (`URLs`, `IPs`, `Domains`, `Registry Keys`, `Mutexes`)
-- [x] **Deterministic Heuristic Engine**: Behavioral rule matches for Process Injection, High Entropy Packers, Ransomware notes, Persistence, C2 Infrastructure
-- [x] **YARA Scanner Engine**: Signature scanner for UPX packers, generic high entropy signatures, injection primitives, ransomware notes
-- [x] **Weighted Risk Engine**: 0–100 normalized risk score calculation & automated threat verdict (`CLEAN / LOW RISK`, `SUSPICIOUS`, `HIGH RISK`, `CRITICAL MALWARE`)
-- [x] **ML Classifier & Feature Extractor**: 25D PE feature vector extractor (`PEFeatureExtractor`) and calibrated `RandomForestClassifier` predicting malware probability & confidence
-- [x] **SHAP Explainability Engine**: SHAP feature attribution calculator (`SHAPExplainer`) highlighting top malware feature pushers vs benign feature pushers
-- [x] **CLI Tool & Test Suite**: `python -m app.engines.static_analysis.cli <file>` and complete test suite (`backend/tests/`)
+**Zeravynex** is a production-grade static malware analysis and threat triage platform for Windows Portable Executable (`.exe`, `.dll`) files. 
 
-## Tech Stack
+Unlike traditional black-box detection tools, Zeravynex provides **transparent, explainable security decisions** by fusing deterministic heuristics, YARA signatures, machine learning models, and **SHAP (SHapley Additive exPlanations)** to explain *why* a binary was classified as malicious.
 
-| Layer | Technology |
-|-------|-----------|
-| Backend | Python 3.11+, FastAPI, Celery, PostgreSQL |
-| PE Analysis | pefile, yara-python, custom extractors |
-| ML | scikit-learn, SHAP |
-| Frontend | React 18+, TypeScript, Vite, Vanilla CSS |
-| Infrastructure | Docker, Nginx, GitHub Actions |
+> ⚠️ **Safety Notice**: Zeravynex performs **Static Analysis ONLY**. Uploaded binaries are never dynamically executed on the host.
 
-## License
+---
 
-MIT
+## ✨ Key Features
+
+| Capability | Description |
+|---|---|
+| 🔍 **Deep PE Parsing** | Analyzes DOS/NT/Optional headers, section permissions (`RWX`), entry-point anomalies, entropy distribution, and compile timestamps. |
+| 🛡️ **YARA Rule Engine** | Integrated pattern matching for known malware families, UPX/packers, process injection primitives, and ransomware artifacts. |
+| 🎯 **IOC Extraction** | Automatic regex extraction of IPv4 addresses, domains, URLs, registry persistence keys, file system paths, and mutexes. |
+| 🤖 **Explainable Machine Learning** | 25-dimensional feature extractor with a calibrated Classifier + **SHAP waterfall attributions** showing exact push factors. |
+| ⚖️ **Decision Fusion Engine** | Multi-signal risk aggregator scoring threats from 0 to 100 (`CLEAN`, `SUSPICIOUS`, `HIGH RISK`, `CRITICAL MALWARE`). |
+| ⚡ **Modern Web Dashboard** | Sleek React 18 + TypeScript interface with section entropy graphs, live risk gauges, and IOC exploration. |
+| 💻 **CLI & API First** | Inspect binaries via a command-line interface or consume via comprehensive FastAPI REST endpoints. |
+
+---
+
+## 🏗️ System Architecture
+
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer"]
+        CLI["💻 CLI Tool"]
+        WebUI["⚛️ React 18 Dashboard"]
+    end
+
+    subgraph Backend ["FastAPI Backend Layer"]
+        API["⚡ REST API Endpoints"]
+        Worker["⚙️ Async Analysis Worker"]
+        DB[("🗄️ SQLite / Incident Store")]
+    end
+
+    subgraph Engines ["Analysis & ML Engine Suite"]
+        PE["🔍 Static PE Parser (pefile)"]
+        YARA["🛡️ YARA Scanner"]
+        IOC["🎯 IOC Extractor"]
+        ML["🤖 ML Feature Extractor & Classifier"]
+        SHAP["📊 SHAP Explainability Engine"]
+        Fusion["⚖️ Decision Fusion Risk Scorer"]
+    end
+
+    Client -->|Upload Binary| API
+    API -->|Enqueue Task| Worker
+    Worker --> PE & YARA & IOC & ML
+    ML --> SHAP
+    PE & YARA & IOC & ML & SHAP --> Fusion
+    Fusion -->|Consolidated Report| DB
+    DB -->|Fetch Results| API
+```
+
+---
+
+## 🚀 Quickstart
+
+### Prerequisites
+- **Python 3.11+**
+- **Node.js 18+** & `npm`
+- **Git**
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/intrance7/Zeravynex.git
+cd Zeravynex
+```
+
+### 2. Backend Setup
+```bash
+# Set up Python virtual environment
+python -m venv venv
+
+# Activate virtual environment
+# Windows:
+.\venv\Scripts\Activate.ps1
+# Linux/macOS:
+source venv/bin/activate
+
+# Install dependencies
+pip install -r backend/requirements.txt
+
+# Start the FastAPI server
+cd backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+API Documentation will be available at: **`http://localhost:8000/docs`**
+
+### 3. Frontend Setup
+```bash
+# In a new terminal window
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start Vite development server
+npm run dev
+```
+Web Dashboard will be available at: **`http://localhost:5173`**
+
+### 4. CLI Usage
+You can also run static analysis directly from the terminal without starting the web UI:
+```bash
+python -m app.engines.static_analysis.cli path/to/sample.exe
+```
+
+---
+
+## 📡 API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/v1/health` | Healthcheck and service status |
+| `POST` | `/api/v1/analyze` | Submit PE binary for static analysis |
+| `GET` | `/api/v1/analyses` | List recent sample analysis history |
+| `GET` | `/api/v1/analyses/{id}` | Retrieve comprehensive analysis report & SHAP attributions |
+| `DELETE` | `/api/v1/analyses/{id}` | Remove sample record and analysis data |
+
+---
+
+## 🗺️ Project Roadmap
+
+- [x] **Phase 0: Architecture Specification** — System design & risk model specification
+- [x] **Phase 1: Malware Analysis Engine** — PE header parsing, section entropy, IOC extraction & CLI
+- [x] **Phase 2: Heuristics & YARA Engine** — Signature scanner and evidence-weighted risk scoring
+- [x] **Phase 3: Machine Learning & Explainability** — 25D PE feature extractor, classifier, and SHAP explanations
+- [x] **Phase 4: Decision Fusion Engine** — Multi-signal scoring engine
+- [x] **Phase 5: Backend API & Persistence** — FastAPI endpoints & SQLite database
+- [x] **Phase 6: React Dashboard** — Threat overview, entropy charts, SHAP visualizer, and history
+- [ ] **Phase 7: AI Analyst Engine** — LLM narrative threat summaries & MITRE ATT&CK auto-mapping
+- [ ] **Phase 8: Desktop Packaging** — Tauri cross-platform desktop shell
+
+---
+
+## 🧪 Testing
+
+Run backend unit and integration tests:
+```bash
+cd backend
+pytest tests/ -v
+```
+
+Typecheck and build the frontend:
+```bash
+cd frontend
+npm run build
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please check out [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines, coding standards, and branch conventions.
+
+---
+
+## 🔒 Security
+
+For vulnerability disclosures and reporting procedures, please refer to [SECURITY.md](SECURITY.md).
+
+---
+
+## 📄 License
+
+This project is licensed under the terms of the [MIT License](LICENSE).

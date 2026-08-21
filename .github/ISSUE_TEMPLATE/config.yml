@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/intrance7/Zeravynex/discussions
+    about: Ask questions, share ideas, and discuss malware analysis topics with the community.
+  - name: 🔒 Security Vulnerability Report
+    url: https://github.com/intrance7/Zeravynex/security/advisories/new
+    about: Privately report potential security vulnerabilities in Zeravynex.

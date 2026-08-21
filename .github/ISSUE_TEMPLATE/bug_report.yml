@@ -1,0 +1,59 @@
+name: 🐛 Bug Report
+description: Report an issue or unexpected behavior in Zeravynex
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the form below as completely as possible.
+  - type: input
+    id: component
+    attributes:
+      label: Affected Component
+      description: e.g. Static Analyzer, YARA Engine, ML Engine, FastAPI Backend, React Frontend
+      placeholder: e.g. Static Analyzer
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Submit PE file 'sample.exe' to `/api/v1/analyze`
+        2. Wait for analysis worker to complete
+        3. Check response payload
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A clear and concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment & Versions
+      description: OS version, Python version, Node.js version, browser (if frontend).
+      placeholder: |
+        - OS: Windows 11 / Ubuntu 22.04
+        - Python: 3.11.x
+        - Node: v20.x
+        - Browser: Chrome 120
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output or Stack Trace
+      description: Please copy and paste any relevant logs here.
+      render: shell

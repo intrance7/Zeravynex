@@ -1,0 +1,33 @@
+name: 🎯 Detection Rule / YARA Signature Request
+description: Suggest a new YARA rule, heuristic behavioral rule, or IOC extractor enhancement
+labels: ["detection-rules", "yara", "heuristics"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose additions or improvements to Zeravynex's detection capabilities (YARA rules, PE heuristic patterns, IOC regexes).
+  - type: dropdown
+    id: category
+    attributes:
+      label: Detection Category
+      options:
+        - YARA Signature (Ransomware, Packers, Droppers, C2)
+        - PE Static Heuristics (Section anomalies, IAT patterns)
+        - IOC Extractor (Regex for URLs, IPs, Mutexes, Registry Keys)
+        - ML Feature Extraction
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Threat or Behavior Details
+      description: Describe the threat family, technique, or behavioral pattern (include MITRE ATT&CK technique IDs if known).
+      placeholder: e.g. LockBit 3.0 ransomware ransom note format, Process Hollowing API call sequence (T1055.012)
+    validations:
+      required: true
+  - type: textarea
+    id: signature
+    attributes:
+      label: Proposed Rule or Signature (Optional)
+      description: If you have a draft YARA rule or regex snippet, provide it here.
+      render: yara
