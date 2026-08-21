@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Shield, Activity, Database, Settings, 
-  LogOut, User as UserIcon, Search, Bell, Hexagon, Terminal
+  LogOut, User as UserIcon, Search, Bell, Hexagon, Terminal, Network
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';

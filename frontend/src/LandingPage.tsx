@@ -1,16 +1,6 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Activity, FileSearch, Zap } from 'lucide-react';
+import { ArrowRight, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
-
-const analysisSteps = [
-  { id: 1, label: 'Sample', icon: FileSearch },
-  { id: 2, label: 'Static Analysis', icon: Activity },
-  { id: 3, label: 'Behavior', icon: Activity },
-  { id: 4, label: 'IOCs', icon: Zap },
-  { id: 5, label: 'Threat Intelligence', icon: Shield },
-  { id: 6, label: 'AI Explanation', icon: Activity },
-  { id: 7, label: 'Verdict', icon: Shield },
-];
 
 export default function LandingPage() {
   return (

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Lock, Braces } from 'lucide-react';
+import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Braces } from 'lucide-react';
 import { cn } from './lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { CopyButton } from './CopyButton';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
@@ -135,8 +136,13 @@ export default function ReportView() {
         </div>
 
         <div className="relative z-10 flex gap-4 md:text-right">
-          <div className="bg-card rounded-lg border border-border p-3 shadow-sm min-w-[140px]">
-            <p className="text-[10px] uppercase text-muted-foreground font-bold tracking-widest mb-1">SHA256</p>
+          <div className="bg-card rounded-lg border border-border p-3 shadow-sm min-w-[170px]">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <p className="text-[10px] uppercase text-muted-foreground font-bold tracking-widest">SHA256</p>
+              {analysisResult.hashes?.sha256 && (
+                <CopyButton text={analysisResult.hashes.sha256} label="Copy" />
+              )}
+            </div>
             <p className="font-mono text-xs text-foreground truncate max-w-[180px]" title={analysisResult.hashes?.sha256}>
               {analysisResult.hashes?.sha256 || 'N/A'}
             </p>
@@ -149,6 +155,7 @@ export default function ReportView() {
           </div>
         </div>
       </div>
+
 
       {/* Navigation Tabs */}
       <div className="flex overflow-x-auto gap-2 border-b border-border pb-[1px] mb-8 scrollbar-none">
@@ -299,7 +306,7 @@ export default function ReportView() {
                             cursor={{fill: 'hsl(var(--muted)/0.3)'}}
                             contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.5)' }}
                             itemStyle={{ fontWeight: 600, fontFamily: 'monospace' }}
-                            formatter={(value: number) => [Math.abs(value).toFixed(4), 'SHAP Value']}
+                            formatter={(value: any) => [Math.abs(Number(value) || 0).toFixed(4), 'SHAP Value']}
                           />
                           <Bar dataKey="value" radius={[0, 4, 4, 0]} maxBarSize={32}>
                             {
@@ -461,7 +468,10 @@ export default function ReportView() {
                       {analysisResult.static_analysis?.extracted_iocs?.ipv4?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {analysisResult.static_analysis.extracted_iocs.ipv4.map((ip: string, idx: number) => (
-                            <span key={idx} className="font-mono text-xs px-2 py-1 bg-muted/30 border border-border rounded text-foreground">{ip}</span>
+                            <div key={idx} className="flex items-center gap-1 bg-muted/30 border border-border rounded px-2 py-0.5">
+                              <span className="font-mono text-xs text-foreground">{ip}</span>
+                              <CopyButton text={ip} />
+                            </div>
                           ))}
                         </div>
                       ) : <span className="text-xs text-muted-foreground">None found</span>}
@@ -472,7 +482,10 @@ export default function ReportView() {
                       {analysisResult.static_analysis?.extracted_iocs?.urls?.length > 0 ? (
                         <ul className="space-y-1">
                           {analysisResult.static_analysis.extracted_iocs.urls.map((url: string, idx: number) => (
-                            <li key={idx} className="font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground truncate select-all">{url.replace('http', 'hxxp')}</li>
+                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
+                              <span className="truncate select-all">{url.replace('http', 'hxxp')}</span>
+                              <CopyButton text={url} />
+                            </li>
                           ))}
                         </ul>
                       ) : <span className="text-xs text-muted-foreground">None found</span>}
@@ -490,7 +503,10 @@ export default function ReportView() {
                       {analysisResult.static_analysis?.extracted_iocs?.registry_keys?.length > 0 ? (
                         <ul className="space-y-1">
                           {analysisResult.static_analysis.extracted_iocs.registry_keys.map((reg: string, idx: number) => (
-                            <li key={idx} className="font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground truncate select-all">{reg}</li>
+                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
+                              <span className="truncate select-all">{reg}</span>
+                              <CopyButton text={reg} />
+                            </li>
                           ))}
                         </ul>
                       ) : <span className="text-xs text-muted-foreground">None found</span>}
@@ -501,7 +517,10 @@ export default function ReportView() {
                       {analysisResult.static_analysis?.extracted_iocs?.mutexes?.length > 0 ? (
                         <ul className="space-y-1">
                           {analysisResult.static_analysis.extracted_iocs.mutexes.map((mtx: string, idx: number) => (
-                            <li key={idx} className="font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground select-all">{mtx}</li>
+                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
+                              <span className="select-all">{mtx}</span>
+                              <CopyButton text={mtx} />
+                            </li>
                           ))}
                         </ul>
                       ) : <span className="text-xs text-muted-foreground">None found</span>}
