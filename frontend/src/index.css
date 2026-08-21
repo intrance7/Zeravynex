@@ -2,67 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @layer base {
   :root {
-    --background: 240 10% 4%; /* Dark gray/black */
-    --foreground: 0 0% 98%;
+    /* Backgrounds: Deep Space/Slate */
+    --background: 222 47% 4%; 
+    --foreground: 210 40% 98%;
 
-    --card: 240 10% 6%;
-    --card-foreground: 0 0% 98%;
+    --card: 222 47% 5.5%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 6%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
 
-    --primary: 217 91% 60%; /* Vibrant blue */
-    --primary-foreground: 0 0% 98%;
+    /* Brand primary: Cyber Blue */
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 240 4% 16%;
-    --secondary-foreground: 0 0% 98%;
+    /* Secondary backgrounds */
+    --secondary: 217.2 32.6% 12.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%;
+    /* Muted elements */
+    --muted: 217.2 32.6% 11.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217 91% 60%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217.2 32.6% 12.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%; /* Red */
-    --destructive-foreground: 0 0% 98%;
+    /* Semantic Severities */
+    --destructive: 0 84.2% 60.2%; /* Critical Red */
+    --destructive-foreground: 210 40% 98%;
+    
+    --warning: 38 92% 50%; /* Amber High/Suspicious */
+    --warning-foreground: 210 40% 98%;
+    
+    --success: 142 71% 45%; /* Emerald Clean */
+    --success-foreground: 210 40% 98%;
 
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 217 91% 60%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
 
-    --radius: 0.5rem;
-  }
-
-  .light {
-    --background: 0 0% 100%;
-    --foreground: 240 10% 4%;
-
-    --card: 0 0% 98%;
-    --card-foreground: 240 10% 4%;
-
-    --popover: 0 0% 98%;
-    --popover-foreground: 240 10% 4%;
-
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 5% 90%;
-    --secondary-foreground: 240 10% 4%;
-
-    --muted: 240 5% 90%;
-    --muted-foreground: 240 5% 45%;
-
-    --accent: 217 91% 50%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 84% 50%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5% 85%;
-    --input: 240 5% 85%;
-    --ring: 217 91% 50%;
+    --radius: 0.35rem;
   }
 }
 
@@ -71,9 +54,31 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    background-image: radial-gradient(circle at top, rgba(50, 100, 255, 0.05), transparent 50%),
-                      radial-gradient(circle at bottom right, rgba(255, 50, 50, 0.03), transparent 40%);
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    /* Subtle grid background for tech feel */
+    background-image: 
+      linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
     background-attachment: fixed;
   }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* Custom Scrollbar for Webkit */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-muted-foreground/20 rounded-full border-[2px] border-transparent bg-clip-padding;
+}
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground/40;
 }
