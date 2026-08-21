@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Shield, Activity, Database, Settings, 
@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import CommandPalette from './CommandPalette';
 
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -16,10 +17,32 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
     navigate('/login');
   };
 
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const navItems = [
-    { to: '/', icon: Activity, label: 'Analysis Report' },
-    { to: '/analysis', icon: Hexagon, label: 'Submit Payload' },
-    { to: '/history', icon: Database, label: 'Threat History' },
+    { to: '/dashboard', icon: Activity, label: 'Overview' },
+    { to: '/dashboard/analyze', icon: Hexagon, label: 'Analyze' },
+    { to: '/dashboard/investigations', icon: Search, label: 'Investigations' },
+    { to: '/dashboard/samples', icon: Database, label: 'Samples' },
+    { to: '/dashboard/intel', icon: Shield, label: 'Threat Intelligence' },
+    { to: '/dashboard/graph', icon: Network, label: 'Threat Graph' },
+    { to: '/dashboard/reports', icon: Terminal, label: 'Reports' },
+    { to: '/dashboard/collections', icon: Database, label: 'Collections' },
+    { to: '/dashboard/api', icon: Terminal, label: 'API' },
+    { to: '/dashboard/usage', icon: Activity, label: 'Usage' },
+    { to: '/dashboard/billing', icon: Database, label: 'Billing' },
+    { to: '/dashboard/settings', icon: Settings, label: 'Settings' },
   ];
 
   return (
@@ -84,18 +107,17 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
           
           {/* Search Bar */}
           <div className="flex-1 max-w-xl flex items-center">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="text" 
-                placeholder="Search by SHA256, Tag, or IP..." 
-                className="w-full bg-background border border-border rounded-md py-1.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground/50 font-mono shadow-inner"
-              />
+            <button 
+              onClick={() => setIsCommandOpen(true)}
+              className="relative w-full flex items-center bg-background border border-border rounded-md py-1.5 pl-3 pr-4 text-sm text-muted-foreground/70 hover:border-primary/50 transition-all font-mono shadow-inner text-left"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              Search by SHA256, Tag, or IP...
               <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
                 <kbd className="px-1.5 py-0.5 bg-card rounded text-[10px] text-muted-foreground border border-border font-mono">Ctrl</kbd>
                 <kbd className="px-1.5 py-0.5 bg-card rounded text-[10px] text-muted-foreground border border-border font-mono">K</kbd>
               </div>
-            </div>
+            </button>
           </div>
 
           {/* Right Actions */}
@@ -154,6 +176,8 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
         </main>
 
       </div>
+
+      <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
     </div>
   );
 }

@@ -71,7 +71,7 @@ export default function AnalysisContent() {
       
       if (res.ok) {
         toast.success(`Analysis Complete: Verdict ${data.verdict}`, { id: 'upload' });
-        navigate('/', { state: { sha256: data.sha256 } });
+        navigate('/dashboard/report', { state: { sha256: data.sha256 } });
       } else {
         toast.error(`Analysis failed: ${data.detail}`, { id: 'upload' });
         setIsUploading(false);
