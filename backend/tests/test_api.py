@@ -66,7 +66,26 @@ def test_analyze_endpoint_valid_pe(tmp_path):
         assert "analysis_id" in data
         assert data["status"] == "completed"
 
+def test_health_check_endpoint():
+    response = client.get("/api/v1/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] in ["healthy", "degraded"]
+    assert "checks" in data
+    assert "database" in data["checks"]
+    assert "yara_engine" in data["checks"]
+
 def test_get_history_empty():
     response = client.get("/api/v1/history")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+def test_get_report_by_nonexistent_id():
+    response = client.get("/api/v1/report/id/999999")
+    assert response.status_code == 404
+
+def test_search_reports_empty():
+    response = client.get("/api/v1/report/search?q=test")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)
+
