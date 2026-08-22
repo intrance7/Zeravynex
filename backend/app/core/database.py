@@ -1,23 +1,32 @@
-import os
+"""
+Database engine and session configuration.
+Supports SQLite (dev) and PostgreSQL (production) with connection pooling.
+"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+from app.core.config import get_settings
 
-# Define database URL (using SQLite in the project root for simplicity)
-DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./zeravynex.db")
+settings = get_settings()
 
-# Create SQLAlchemy engine
-engine = create_engine(
-    DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
-)
+# Configure engine with connection pooling if using PostgreSQL/MySQL
+engine_kwargs = {}
+if settings.is_sqlite:
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+else:
+    engine_kwargs["pool_size"] = settings.DB_POOL_SIZE
+    engine_kwargs["max_overflow"] = settings.DB_MAX_OVERFLOW
+    engine_kwargs["pool_pre_ping"] = True
+    engine_kwargs["pool_recycle"] = settings.DB_POOL_RECYCLE
 
-# Create SessionLocal class
+engine = create_engine(settings.DATABASE_URL, **engine_kwargs)
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base class for models
 Base = declarative_base()
 
-# Dependency to get DB session
+
 def get_db():
+    """FastAPI dependency that yields a database session and closes it after use."""
     db = SessionLocal()
     try:
         yield db

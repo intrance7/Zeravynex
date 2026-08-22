@@ -1,0 +1,52 @@
+# ── Stage 1: Builder ──────────────────────────────────────────────────────────
+FROM python:3.11-slim AS builder
+
+WORKDIR /build
+
+# Install build-time system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libssl-dev \
+    libffi-dev \
+    libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# ── Stage 2: Production Runtime ──────────────────────────────────────────────
+FROM python:3.11-slim AS runtime
+
+# Security: Run as non-root user
+RUN groupadd --gid 1000 zeravynex && \
+    useradd --uid 1000 --gid zeravynex --shell /bin/bash --create-home zeravynex
+
+WORKDIR /app
+
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libmagic1 \
+    curl \
+    tini \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python packages from builder
+COPY --from=builder /root/.local /home/zeravynex/.local
+ENV PATH=/home/zeravynex/.local/bin:$PATH
+ENV PYTHONPATH=/app/backend
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Copy application source
+COPY backend /app/backend
+
+# Switch to non-root user
+USER zeravynex
+
+EXPOSE 8000
+
+# Use tini as init process for proper signal handling
+ENTRYPOINT ["tini", "--"]
+
+# Production server with multiple workers
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4", "--log-level", "info"]

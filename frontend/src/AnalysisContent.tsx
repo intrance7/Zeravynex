@@ -69,12 +69,46 @@ export default function AnalysisContent() {
       
       const data = await res.json();
       
-      if (res.ok) {
+      if (!res.ok) {
+        toast.error(`Analysis failed: ${data.detail || 'Unknown error'}`, { id: 'upload' });
+        setIsUploading(false);
+        return;
+      }
+
+      if (data.status === 'completed') {
         toast.success(`Analysis Complete: Verdict ${data.verdict}`, { id: 'upload' });
         navigate('/dashboard/report', { state: { sha256: data.sha256 } });
-      } else {
-        toast.error(`Analysis failed: ${data.detail}`, { id: 'upload' });
-        setIsUploading(false);
+      } else if (data.status === 'queued' && data.task_id) {
+        // Polling worker task until complete
+        toast.loading('Queued on analysis cluster. Processing...', { id: 'upload' });
+        
+        let attempts = 0;
+        const pollInterval = setInterval(async () => {
+          attempts++;
+          try {
+            const taskRes = await fetch(`${API_BASE}/tasks/${data.task_id}`);
+            if (taskRes.ok) {
+              const taskData = await taskRes.json();
+              if (taskData.status === 'completed') {
+                clearInterval(pollInterval);
+                toast.success(`Analysis Complete: Verdict ${taskData.result?.verdict || 'DONE'}`, { id: 'upload' });
+                navigate('/dashboard/report', { state: { sha256: taskData.result?.sha256 } });
+              } else if (taskData.status === 'failed') {
+                clearInterval(pollInterval);
+                toast.error(`Worker failed: ${taskData.error || 'Execution error'}`, { id: 'upload' });
+                setIsUploading(false);
+              }
+            }
+          } catch (pollErr) {
+            console.error("Poll error:", pollErr);
+          }
+
+          if (attempts > 60) { // 60 seconds timeout
+            clearInterval(pollInterval);
+            toast.error('Analysis timed out. Check history later.', { id: 'upload' });
+            setIsUploading(false);
+          }
+        }, 1000);
       }
     } catch (err) {
       console.error(err);
@@ -82,6 +116,7 @@ export default function AnalysisContent() {
       setIsUploading(false);
     }
   };
+
 
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto w-full">

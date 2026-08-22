@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Braces } from 'lucide-react';
+import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Code2 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { CopyButton } from './CopyButton';
+import PEStaticAnalysis from './PEStaticAnalysis';
+import ImportAnalysis from './ImportAnalysis';
+import IocCenter from './IocCenter';
+import MitreAttackView from './MitreAttackView';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
-type Tab = 'overview' | 'static' | 'ml' | 'iocs';
+type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre';
 
 export default function ReportView() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -162,8 +166,10 @@ export default function ReportView() {
         {[
           { id: 'overview', label: 'Executive Overview', icon: Activity },
           { id: 'static', label: 'Static & PE Details', icon: Binary },
+          { id: 'api', label: 'API Analysis', icon: Code2 },
+          { id: 'iocs', label: 'IOC Center', icon: Network },
+          { id: 'mitre', label: 'MITRE ATT&CK', icon: ShieldAlert },
           { id: 'ml', label: 'ML Explainability', icon: Cpu },
-          { id: 'iocs', label: 'Extracted IOCs', icon: Network },
         ].map(tab => (
           <button
             key={tab.id}
@@ -366,170 +372,27 @@ export default function ReportView() {
 
           {/* ---------------- STATIC TAB ---------------- */}
           {activeTab === 'static' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              
-              <div className="bg-card border border-border rounded-xl p-6 shadow-sm overflow-hidden">
-                <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                  <Braces className="w-4 h-4 text-primary" /> PE Sections
-                </h3>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm text-left">
-                    <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30 border-b border-border">
-                      <tr>
-                        <th className="px-4 py-3 font-semibold">Name</th>
-                        <th className="px-4 py-3 font-semibold">Entropy</th>
-                        <th className="px-4 py-3 font-semibold">Size (Raw)</th>
-                        <th className="px-4 py-3 font-semibold">Characteristics</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border/50 font-mono text-xs">
-                      {analysisResult.static_analysis?.pe_info?.sections?.map((sec: any, idx: number) => (
-                        <tr key={idx} className="hover:bg-muted/10 transition-colors">
-                          <td className="px-4 py-3 text-foreground font-bold">{sec.name}</td>
-                          <td className="px-4 py-3">
-                            <div className="flex items-center gap-2">
-                              <span className={sec.entropy > 7.0 ? 'text-destructive font-bold' : ''}>{sec.entropy.toFixed(2)}</span>
-                              <div className="w-12 h-1 bg-muted rounded-full overflow-hidden">
-                                <div className={cn("h-full", sec.entropy > 7.0 ? "bg-destructive" : "bg-primary")} style={{ width: `${(sec.entropy / 8) * 100}%` }}></div>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-4 py-3">{sec.size} B</td>
-                          <td className="px-4 py-3 text-muted-foreground">{sec.characteristics}</td>
-                        </tr>
-                      )) || (
-                        <tr><td colSpan={4} className="px-4 py-8 text-center text-muted-foreground">No section data available</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+            <PEStaticAnalysis 
+              peHeader={analysisResult.pe_header}
+              sections={analysisResult.sections}
+              hashes={analysisResult.hashes}
+              metadata={analysisResult.metadata}
+            />
+          )}
 
-              <div className="space-y-6">
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4 text-warning" /> Heuristic & YARA Hits
-                  </h3>
-                  
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">YARA Signatures</h4>
-                      {analysisResult.static_analysis?.yara_hits?.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {analysisResult.static_analysis.yara_hits.map((hit: string, idx: number) => (
-                            <span key={idx} className="px-2 py-1 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-mono rounded">
-                              {hit}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">No YARA signatures matched.</p>
-                      )}
-                    </div>
-                    
-                    <div className="pt-2 border-t border-border/50">
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2">Heuristic Alerts</h4>
-                      {analysisResult.static_analysis?.heuristic_hits?.length > 0 ? (
-                        <ul className="space-y-2">
-                          {analysisResult.static_analysis.heuristic_hits.map((hit: any, idx: number) => (
-                            <li key={idx} className="text-xs text-foreground bg-warning/5 border border-warning/20 p-2 rounded flex items-start gap-2">
-                              <ShieldAlert className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
-                              <span className="font-mono">{hit.rule || hit}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="text-xs text-muted-foreground italic">No heuristic rules matched.</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+          {/* ---------------- API TAB ---------------- */}
+          {activeTab === 'api' && (
+            <ImportAnalysis importsExports={analysisResult.imports_exports} />
           )}
 
           {/* ---------------- IOCS TAB ---------------- */}
           {activeTab === 'iocs' && (
-            <div className="bg-card border border-border rounded-xl p-6 shadow-sm overflow-hidden">
-              <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                <Network className="w-4 h-4 text-primary" /> Extracted Indicators of Compromise (IOCs)
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
-                
-                {/* URLs / IPs */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 pb-2 border-b border-border/50">Network Infrastructure</h4>
-                  <div className="space-y-4">
-                    {/* IPv4 */}
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-semibold mb-1">IPv4 Addresses</p>
-                      {analysisResult.static_analysis?.extracted_iocs?.ipv4?.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {analysisResult.static_analysis.extracted_iocs.ipv4.map((ip: string, idx: number) => (
-                            <div key={idx} className="flex items-center gap-1 bg-muted/30 border border-border rounded px-2 py-0.5">
-                              <span className="font-mono text-xs text-foreground">{ip}</span>
-                              <CopyButton text={ip} />
-                            </div>
-                          ))}
-                        </div>
-                      ) : <span className="text-xs text-muted-foreground">None found</span>}
-                    </div>
-                    {/* URLs */}
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-semibold mb-1">URLs & Domains</p>
-                      {analysisResult.static_analysis?.extracted_iocs?.urls?.length > 0 ? (
-                        <ul className="space-y-1">
-                          {analysisResult.static_analysis.extracted_iocs.urls.map((url: string, idx: number) => (
-                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
-                              <span className="truncate select-all">{url.replace('http', 'hxxp')}</span>
-                              <CopyButton text={url} />
-                            </li>
-                          ))}
-                        </ul>
-                      ) : <span className="text-xs text-muted-foreground">None found</span>}
-                    </div>
-                  </div>
-                </div>
+            <IocCenter iocs={analysisResult.iocs} />
+          )}
 
-                {/* Host Artifacts */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 pb-2 border-b border-border/50">Host Artifacts</h4>
-                  <div className="space-y-4">
-                    {/* Registry */}
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-semibold mb-1">Registry Keys</p>
-                      {analysisResult.static_analysis?.extracted_iocs?.registry_keys?.length > 0 ? (
-                        <ul className="space-y-1">
-                          {analysisResult.static_analysis.extracted_iocs.registry_keys.map((reg: string, idx: number) => (
-                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
-                              <span className="truncate select-all">{reg}</span>
-                              <CopyButton text={reg} />
-                            </li>
-                          ))}
-                        </ul>
-                      ) : <span className="text-xs text-muted-foreground">None found</span>}
-                    </div>
-                    {/* Mutexes */}
-                    <div>
-                      <p className="text-[10px] text-muted-foreground font-semibold mb-1">Named Mutexes</p>
-                      {analysisResult.static_analysis?.extracted_iocs?.mutexes?.length > 0 ? (
-                        <ul className="space-y-1">
-                          {analysisResult.static_analysis.extracted_iocs.mutexes.map((mtx: string, idx: number) => (
-                            <li key={idx} className="flex items-center justify-between font-mono text-[11px] px-2 py-1 bg-muted/30 border border-border rounded text-foreground gap-2">
-                              <span className="select-all">{mtx}</span>
-                              <CopyButton text={mtx} />
-                            </li>
-                          ))}
-                        </ul>
-                      ) : <span className="text-xs text-muted-foreground">None found</span>}
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
+          {/* ---------------- MITRE TAB ---------------- */}
+          {activeTab === 'mitre' && (
+            <MitreAttackView mitreMappings={mitre} />
           )}
 
         </motion.div>
