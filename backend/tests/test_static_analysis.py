@@ -131,3 +131,133 @@ def test_phase2_end_to_end(tmp_path):
     assert "yara_analysis" in report
     assert report["risk_analysis"]["risk_score"] >= 0
     assert report["metadata"]["engine_version"].startswith("Zeravynex Phase")
+
+
+@pytest.fixture
+def mock_report_data():
+    """Return a deterministic static analysis report dictionary for CLI testing."""
+    return {
+        "metadata": {"file_name": "<script>alert('xss')</script>.exe", "engine_version": "Zeravynex Phase 2"},
+        "hashes": {"sha256": "abc123sha256", "md5": "abc123md5", "sha1": "abc123sha1", "size_bytes": 1024, "entropy": 6.5},
+        "pe_header": {"is_pe": True, "architecture": "x86_64", "file_type": "Executable", "entry_point": "0x1000", "compile_timestamp": "2026-01-01"},
+        "sections": [{"name": ".text"}],
+        "imports_exports": {"total_imported_functions": 10, "imports": {"kernel32.dll": ["VirtualAlloc"]}},
+        "risk_analysis": {"verdict": "MALICIOUS", "risk_score": 85, "severity_level": "CRITICAL"},
+        "ml_analysis": {
+            "prediction": "Malware",
+            "malware_probability": 0.95,
+            "architecture": "RandomForest",
+            "shap_explainability": {
+                "explanation_summary": "High risk detected",
+                "top_malware_indicators": [{"feature_name": "entropy", "feature_value": "6.5", "shap_value": 0.45}]
+            }
+        },
+        "heuristic_analysis": {
+            "total_heuristic_matches": 1,
+            "matches": [{"severity": "HIGH", "rule_name": "HEUR_RWX", "description": "RWX section found", "weight": 40}]
+        },
+        "yara_analysis": {
+            "total_matches": 1,
+            "matches": [{"severity": "CRITICAL", "rule": "Suspicious_Imports", "category": "Execution"}]
+        },
+        "iocs": {
+            "urls": ["http://evil-c2.com/payload?cmd=<script>"],
+            "ip_addresses": ["1.2.3.4"],
+            "domains": ["evil-c2.com"],
+            "registry_keys": ["HKLM\\Run\\Malware"],
+            "mutexes": ["Global\\TestMutex"]
+        }
+    }
+
+
+def test_cli_json_export_options(tmp_path, monkeypatch, mock_report_data):
+    """Test CLI JSON export flags and aliases (--json, --output-json, -o, --output)."""
+    import json
+    from app.engines.static_analysis import cli
+
+    monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)
+
+    sample_bin = tmp_path / "sample.exe"
+    sample_bin.write_bytes(b"MZtest")
+
+    # Test --json flag
+    json_out1 = tmp_path / "report1.json"
+    cli.main([str(sample_bin), "--json", str(json_out1)])
+    assert json_out1.exists()
+    data1 = json.loads(json_out1.read_text(encoding="utf-8"))
+    assert data1["hashes"]["sha256"] == "abc123sha256"
+
+    # Test --output-json alias
+    json_out2 = tmp_path / "report2.json"
+    cli.main([str(sample_bin), "--output-json", str(json_out2)])
+    assert json_out2.exists()
+
+    # Test legacy -o and --output aliases
+    json_out3 = tmp_path / "report3.json"
+    cli.main([str(sample_bin), "-o", str(json_out3)])
+    assert json_out3.exists()
+
+    json_out4 = tmp_path / "report4.json"
+    cli.main([str(sample_bin), "--output", str(json_out4)])
+    assert json_out4.exists()
+
+
+def test_cli_html_export_options(tmp_path, monkeypatch, mock_report_data):
+    """Test CLI HTML export flags (--html, --output-html)."""
+    import html
+    from app.engines.static_analysis import cli
+
+    monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)
+
+    sample_bin = tmp_path / "sample.exe"
+    sample_bin.write_bytes(b"MZtest")
+
+    # Test --html flag
+    html_out1 = tmp_path / "report1.html"
+    cli.main([str(sample_bin), "--html", str(html_out1)])
+    assert html_out1.exists()
+    content1 = html_out1.read_text(encoding="utf-8")
+    assert "ZERAVYNEX THREAT REPORT" in content1
+    assert "MALICIOUS" in content1
+    assert "85 / 100" in content1
+
+    # Test --output-html alias
+    html_out2 = tmp_path / "report2.html"
+    cli.main([str(sample_bin), "--output-html", str(html_out2)])
+    assert html_out2.exists()
+
+
+def test_cli_html_security_escaping(tmp_path, monkeypatch, mock_report_data):
+    """Verify that dynamic strings in HTML reports are properly escaped against XSS injection."""
+    import html
+    from app.engines.static_analysis import cli
+
+    monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)
+
+    sample_bin = tmp_path / "sample.exe"
+    sample_bin.write_bytes(b"MZtest")
+
+    html_out = tmp_path / "report_sec.html"
+    cli.main([str(sample_bin), "--html", str(html_out)])
+    html_content = html_out.read_text(encoding="utf-8")
+
+    # Raw script tag must not exist
+    assert "<script>alert('xss')</script>" not in html_content
+    # HTML escaped representation must exist
+    assert html.escape("<script>alert('xss')</script>") in html_content
+
+
+def test_cli_help_text(capsys):
+    """Verify CLI parser help text contains new export options and usage examples."""
+    from app.engines.static_analysis import cli
+    with pytest.raises(SystemExit) as exc_info:
+        cli.main(["--help"])
+    assert exc_info.value.code == 0
+    captured = capsys.readouterr()
+    assert "--json" in captured.out
+    assert "--html" in captured.out
+    assert "--output-json" in captured.out
+    assert "--output-html" in captured.out
+    assert "Examples:" in captured.out
+
+
