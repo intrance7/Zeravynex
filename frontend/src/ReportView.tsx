@@ -9,10 +9,11 @@ import PEStaticAnalysis from './PEStaticAnalysis';
 import ImportAnalysis from './ImportAnalysis';
 import IocCenter from './IocCenter';
 import MitreAttackView from './MitreAttackView';
+import ThreatGraphView from './ThreatGraphView';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
-type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre';
+type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre' | 'graph';
 
 export default function ReportView() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
@@ -167,9 +168,10 @@ export default function ReportView() {
           { id: 'overview', label: 'Executive Overview', icon: Activity },
           { id: 'static', label: 'Static & PE Details', icon: Binary },
           { id: 'api', label: 'API Analysis', icon: Code2 },
-          { id: 'iocs', label: 'IOC Center', icon: Network },
+          { id: 'iocs', label: 'IOC Center', icon: Database },
           { id: 'mitre', label: 'MITRE ATT&CK', icon: ShieldAlert },
           { id: 'ml', label: 'ML Explainability', icon: Cpu },
+          { id: 'graph', label: 'Threat Graph', icon: Network },
         ].map(tab => (
           <button
             key={tab.id}
@@ -393,6 +395,11 @@ export default function ReportView() {
           {/* ---------------- MITRE TAB ---------------- */}
           {activeTab === 'mitre' && (
             <MitreAttackView mitreMappings={mitre} />
+          )}
+          
+          {/* ---------------- GRAPH TAB ---------------- */}
+          {activeTab === 'graph' && (
+            <ThreatGraphView />
           )}
 
         </motion.div>

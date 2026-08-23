@@ -11,6 +11,11 @@ import LandingPage from './LandingPage';
 import ReportView from './ReportView';
 import ComingSoon from './ComingSoon';
 
+import InvestigationsView from './InvestigationsView';
+import CollectionsView from './CollectionsView';
+import ReportExperience from './ReportExperience';
+import ThreatGraphView from './ThreatGraphView';
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -48,12 +53,12 @@ function App() {
           <Route path="analyze" element={<AnalysisContent />} />
           <Route path="report" element={<ReportView />} />
           <Route path="history" element={<HistoryContent />} />
-          <Route path="investigations" element={<ComingSoon title="Investigations" />} />
+          <Route path="investigations" element={<InvestigationsView />} />
           <Route path="samples" element={<ComingSoon title="Samples" />} />
           <Route path="intel" element={<ComingSoon title="Threat Intelligence" />} />
-          <Route path="graph" element={<ComingSoon title="Threat Graph" />} />
-          <Route path="reports" element={<ComingSoon title="Reports" />} />
-          <Route path="collections" element={<ComingSoon title="Collections" />} />
+          <Route path="graph" element={<ThreatGraphView />} />
+          <Route path="reports" element={<ReportExperience />} />
+          <Route path="collections" element={<CollectionsView />} />
           <Route path="api" element={<ComingSoon title="API" />} />
           <Route path="usage" element={<ComingSoon title="Usage" />} />
           <Route path="billing" element={<ComingSoon title="Billing" />} />
