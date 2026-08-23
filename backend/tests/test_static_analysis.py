@@ -71,11 +71,11 @@ def test_ioc_extractor():
         "Contacting C2 domain bad-actor-c2.net"
     ]
     iocs = IOCExtractor.extract_iocs(sample_strings)
-    assert "http://185.220.101.5/beacon.php" in iocs["urls"]
-    assert "185.220.101.5" in iocs["ip_addresses"]
-    assert "bad-actor-c2.net" in set(iocs["domains"])
-    assert "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" in iocs["registry_keys"]
-    assert "Global\\ZeravynexTestMutex" in iocs["mutexes"]
+    assert any(url == "http://185.220.101.5/beacon.php" for url in iocs["urls"])
+    assert any(ip == "185.220.101.5" for ip in iocs["ip_addresses"])
+    assert any(domain == "bad-actor-c2.net" for domain in iocs["domains"])
+    assert any(reg == "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" for reg in iocs["registry_keys"])
+    assert any(mutex == "Global\\ZeravynexTestMutex" for mutex in iocs["mutexes"])
 
 
 def test_heuristic_engine():
