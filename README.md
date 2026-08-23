@@ -2,7 +2,7 @@
 
 # 🛡️ Zeravynex
 
-### **Explainable AI Static Malware Analysis Platform**
+### **Secure Explainable AI Static Malware Analysis Platform**
 
 *Deep Structural Inspection • Machine Learning Triage • SHAP Explainability • Threat Intelligence*
 
