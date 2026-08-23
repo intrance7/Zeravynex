@@ -46,7 +46,12 @@ class IOCExtractor:
         # Extract Domains
         for match in DOMAIN_REGEX.findall(text_block):
             dom_lower = match.lower()
-            if not any(dom_lower.endswith(wl) for wl in DOMAIN_WHITELIST) and len(match) > 4:
+            # Ensure proper domain matching (exact match or subdomain match with preceding dot)
+            is_whitelisted = any(
+                dom_lower == wl or dom_lower.endswith("." + wl)
+                for wl in DOMAIN_WHITELIST
+            )
+            if not is_whitelisted and len(match) > 4:
                 domains.add(match)
 
         # Extract Emails

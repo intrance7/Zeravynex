@@ -73,7 +73,7 @@ def test_ioc_extractor():
     iocs = IOCExtractor.extract_iocs(sample_strings)
     assert "http://185.220.101.5/beacon.php" in iocs["urls"]
     assert "185.220.101.5" in iocs["ip_addresses"]
-    assert "bad-actor-c2.net" in iocs["domains"]
+    assert "bad-actor-c2.net" in set(iocs["domains"])
     assert "HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" in iocs["registry_keys"]
     assert "Global\\ZeravynexTestMutex" in iocs["mutexes"]
 
