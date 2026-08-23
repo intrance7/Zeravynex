@@ -18,7 +18,6 @@ type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre' | 'graph';
 export default function ReportView() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [isAIActionsOpen, setIsAIActionsOpen] = useState(false);
   const location = useLocation();

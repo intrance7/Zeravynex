@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  X, Terminal, Send, Sparkles, BrainCircuit, Bot, User, 
-  ShieldAlert, Activity, Command, ArrowRight
+  X, Send, Sparkles, BrainCircuit, Bot, User, 
+  Activity, ArrowRight
 } from 'lucide-react';
 import { cn } from './lib/utils';
 
@@ -63,7 +63,7 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
     // Mock AI response
     setTimeout(() => {
       let aiContent = "I've analyzed the report based on your request.";
-      let evidence;
+      let evidence: Message['evidence'];
 
       if (text.toLowerCase().includes('critical') || text.toLowerCase().includes('verdict')) {
         aiContent = "This sample was classified as critical due to the presence of high-entropy packed sections combined with known process injection APIs. The ML model assigned an 88% malware probability.";

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Search, ShieldAlert, Globe, Network, Activity, 
+  Search, ShieldAlert, Globe, 
   Database, GitBranch, ArrowRight, ShieldCheck, FileText
 } from 'lucide-react';
 import { cn } from './lib/utils';
