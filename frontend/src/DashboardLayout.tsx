@@ -6,10 +6,12 @@ import {
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
+import AIAnalystPanel from './AIAnalystPanel';
 import CommandPalette from './CommandPalette';
 
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isAIOpen, setIsAIOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -84,18 +86,21 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
         
         {/* User / Status */}
         <div className="px-4 py-4 border-t border-border">
-          <div className="flex items-center gap-3 p-2 bg-background/50 rounded-md border border-border">
-            <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20">
+          <button 
+            onClick={() => setIsAIOpen(true)}
+            className="w-full flex items-center gap-3 p-2 bg-background/50 hover:bg-background transition-colors rounded-md border border-border text-left focus:outline-none focus:ring-1 focus:ring-primary/50"
+          >
+            <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0">
               <Terminal className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 overflow-hidden">
               <p className="text-xs font-semibold truncate text-foreground">Analyst Terminal</p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-success"></div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">Connected</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-mono">Standby</p>
               </div>
             </div>
-          </div>
+          </button>
         </div>
       </aside>
 
@@ -177,6 +182,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
 
       </div>
 
+      <AIAnalystPanel isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
       <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
     </div>
   );

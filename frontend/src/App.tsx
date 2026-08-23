@@ -15,6 +15,7 @@ import InvestigationsView from './InvestigationsView';
 import CollectionsView from './CollectionsView';
 import ReportExperience from './ReportExperience';
 import ThreatGraphView from './ThreatGraphView';
+import ThreatIntelView from './ThreatIntelView';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -55,7 +56,7 @@ function App() {
           <Route path="history" element={<HistoryContent />} />
           <Route path="investigations" element={<InvestigationsView />} />
           <Route path="samples" element={<ComingSoon title="Samples" />} />
-          <Route path="intel" element={<ComingSoon title="Threat Intelligence" />} />
+          <Route path="intel" element={<ThreatIntelView />} />
           <Route path="graph" element={<ThreatGraphView />} />
           <Route path="reports" element={<ReportExperience />} />
           <Route path="collections" element={<CollectionsView />} />

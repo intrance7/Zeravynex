@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Code2 } from 'lucide-react';
+import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fingerprint, Network, Cpu, FileCode2, Binary, Code2, BrainCircuit, ChevronDown } from 'lucide-react';
 import { cn } from './lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
@@ -18,7 +18,9 @@ type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre' | 'graph';
 export default function ReportView() {
   const [analysisResult, setAnalysisResult] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [isAIActionsOpen, setIsAIActionsOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -162,8 +164,9 @@ export default function ReportView() {
       </div>
 
 
-      {/* Navigation Tabs */}
-      <div className="flex overflow-x-auto gap-2 border-b border-border pb-[1px] mb-8 scrollbar-none">
+      {/* Navigation Tabs & Actions */}
+      <div className="flex items-end justify-between border-b border-border mb-8">
+        <div className="flex overflow-x-auto gap-2 scrollbar-none pb-[1px]">
         {[
           { id: 'overview', label: 'Executive Overview', icon: Activity },
           { id: 'static', label: 'Static & PE Details', icon: Binary },
@@ -191,6 +194,48 @@ export default function ReportView() {
             )}
           </button>
         ))}
+        </div>
+
+        {/* AI Actions */}
+        <div className="relative mb-2 pr-2">
+          <button 
+            onClick={() => setIsAIActionsOpen(!isAIActionsOpen)}
+            className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-md text-xs font-bold uppercase tracking-wider transition-colors"
+          >
+            <BrainCircuit className="w-3.5 h-3.5" />
+            AI Actions
+            <ChevronDown className="w-3.5 h-3.5 ml-1" />
+          </button>
+
+          <AnimatePresence>
+            {isAIActionsOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                transition={{ duration: 0.15 }}
+                className="absolute right-2 top-full mt-1 w-56 bg-popover border border-border rounded-md shadow-xl py-1 z-50"
+              >
+                {[
+                  'Explain Verdict', 'Summarize Sample', 'Explain IOC', 
+                  'Map to MITRE', 'Suggest Investigation Steps',
+                  'Generate SOC Report', 'Generate Executive Summary'
+                ].map(action => (
+                  <button 
+                    key={action}
+                    onClick={() => {
+                      setIsAIActionsOpen(false);
+                      // In a real implementation this would emit an event or update global state to open the AI panel.
+                    }}
+                    className="w-full text-left px-3 py-2 text-[12px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                  >
+                    {action}
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
 
       {/* Tab Content Areas */}
