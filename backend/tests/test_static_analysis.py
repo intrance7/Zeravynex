@@ -1,3 +1,5 @@
+import html
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -172,7 +174,6 @@ def mock_report_data():
 
 def test_cli_json_export_options(tmp_path, monkeypatch, mock_report_data):
     """Test CLI JSON export flags and aliases (--json, --output-json, -o, --output)."""
-    import json
     from app.engines.static_analysis import cli
 
     monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)
@@ -204,7 +205,6 @@ def test_cli_json_export_options(tmp_path, monkeypatch, mock_report_data):
 
 def test_cli_html_export_options(tmp_path, monkeypatch, mock_report_data):
     """Test CLI HTML export flags (--html, --output-html)."""
-    import html
     from app.engines.static_analysis import cli
 
     monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)
@@ -229,7 +229,6 @@ def test_cli_html_export_options(tmp_path, monkeypatch, mock_report_data):
 
 def test_cli_html_security_escaping(tmp_path, monkeypatch, mock_report_data):
     """Verify that dynamic strings in HTML reports are properly escaped against XSS injection."""
-    import html
     from app.engines.static_analysis import cli
 
     monkeypatch.setattr(cli.StaticAnalyzer, "analyze", lambda self, path: mock_report_data)

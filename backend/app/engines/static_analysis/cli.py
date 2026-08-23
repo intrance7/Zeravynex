@@ -6,13 +6,15 @@ from pathlib import Path
 from .analyzer import StaticAnalyzer
 
 
+def _escape_html(value) -> str:
+    return html.escape(str(value)) if value is not None else ""
+
+
 def generate_html_report(result: dict) -> str:
     """Generate a clean, standalone HTML summary report from analysis results.
     
     All dynamic strings are safely escaped via html.escape() to prevent HTML/XSS injection.
     """
-    esc = lambda v: html.escape(str(v)) if v is not None else ""
-    
     metadata = result.get("metadata", {})
     hashes = result.get("hashes", {})
     pe = result.get("pe_header", {})
@@ -25,9 +27,9 @@ def generate_html_report(result: dict) -> str:
     sections = result.get("sections", [])
     imports_exports = result.get("imports_exports", {})
 
-    verdict = esc(risk.get("verdict", "UNKNOWN"))
+    verdict = _escape_html(risk.get("verdict", "UNKNOWN"))
     risk_score = risk.get("risk_score", 0)
-    severity_level = esc(risk.get("severity_level", "INFO"))
+    severity_level = _escape_html(risk.get("severity_level", "INFO"))
     
     if risk_score >= 70 or verdict in ("MALICIOUS", "CRITICAL"):
         badge_color = "#dc3545"
@@ -41,7 +43,7 @@ def generate_html_report(result: dict) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zeravynex Threat Analysis - {esc(metadata.get('file_name', 'Report'))}</title>
+    <title>Zeravynex Threat Analysis - {_escape_html(metadata.get('file_name', 'Report'))}</title>
     <style>
         body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }}
         .container {{ max-width: 1000px; margin: 0 auto; background-color: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 24px; }}
@@ -64,7 +66,7 @@ def generate_html_report(result: dict) -> str:
         <div class="header">
             <div>
                 <h1 style="margin:0; border:none; padding:0; color:#f0f6fc;">ZERAVYNEX THREAT REPORT</h1>
-                <span style="color:#8b949e;">Target Binary: {esc(metadata.get('file_name', 'N/A'))}</span>
+                <span style="color:#8b949e;">Target Binary: {_escape_html(metadata.get('file_name', 'N/A'))}</span>
             </div>
             <div class="badge">{verdict}</div>
         </div>
@@ -74,14 +76,14 @@ def generate_html_report(result: dict) -> str:
                 <h3>Risk & Classification Summary</h3>
                 <p><strong>Verdict:</strong> {verdict}</p>
                 <p><strong>Risk Score:</strong> <span class="score-meter">{risk_score} / 100</span> [{severity_level}]</p>
-                <p><strong>ML Prediction:</strong> {esc(ml.get('prediction', 'N/A'))} (Probability: {ml.get('malware_probability', 0.0)*100:.1f}%)</p>
-                <p><strong>Engine Version:</strong> {esc(metadata.get('engine_version', 'N/A'))}</p>
+                <p><strong>ML Prediction:</strong> {_escape_html(ml.get('prediction', 'N/A'))} (Probability: {ml.get('malware_probability', 0.0)*100:.1f}%)</p>
+                <p><strong>Engine Version:</strong> {_escape_html(metadata.get('engine_version', 'N/A'))}</p>
             </div>
             <div class="card">
                 <h3>File Hashes & Metadata</h3>
-                <p><strong>SHA256:</strong> <code style="font-size:0.85em;">{esc(hashes.get('sha256', 'N/A'))}</code></p>
-                <p><strong>MD5:</strong> <code>{esc(hashes.get('md5', 'N/A'))}</code></p>
-                <p><strong>SHA1:</strong> <code>{esc(hashes.get('sha1', 'N/A'))}</code></p>
+                <p><strong>SHA256:</strong> <code style="font-size:0.85em;">{_escape_html(hashes.get('sha256', 'N/A'))}</code></p>
+                <p><strong>MD5:</strong> <code>{_escape_html(hashes.get('md5', 'N/A'))}</code></p>
+                <p><strong>SHA1:</strong> <code>{_escape_html(hashes.get('sha1', 'N/A'))}</code></p>
                 <p><strong>File Size:</strong> {hashes.get('size_bytes', 0)} bytes</p>
                 <p><strong>Entropy:</strong> {hashes.get('entropy', 0.0)} / 8.0</p>
             </div>
@@ -89,25 +91,25 @@ def generate_html_report(result: dict) -> str:
 
         <div class="card" style="margin-bottom: 20px;">
             <h3>PE Header Information</h3>
-            <p><strong>PE Binary:</strong> {esc(pe.get('is_pe', False))}</p>
+            <p><strong>PE Binary:</strong> {_escape_html(pe.get('is_pe', False))}</p>
 """
 
     if pe.get("is_pe"):
-        html_content += f"""            <p><strong>Architecture:</strong> {esc(pe.get('architecture', 'N/A'))} | <strong>Type:</strong> {esc(pe.get('file_type', 'N/A'))}</p>
-            <p><strong>Entry Point:</strong> {esc(pe.get('entry_point', 'N/A'))} | <strong>Compile Timestamp:</strong> {esc(pe.get('compile_timestamp', 'N/A'))}</p>
+        html_content += f"""            <p><strong>Architecture:</strong> {_escape_html(pe.get('architecture', 'N/A'))} | <strong>Type:</strong> {_escape_html(pe.get('file_type', 'N/A'))}</p>
+            <p><strong>Entry Point:</strong> {_escape_html(pe.get('entry_point', 'N/A'))} | <strong>Compile Timestamp:</strong> {_escape_html(pe.get('compile_timestamp', 'N/A'))}</p>
             <p><strong>Sections Count:</strong> {len(sections)} | <strong>Imports:</strong> {imports_exports.get('total_imported_functions', 0)} functions from {len(imports_exports.get('imports', {}))} DLLs</p>
 """
     html_content += """        </div>
 
         <div class="card" style="margin-bottom: 20px;">
             <h3>ML & SHAP Explainability</h3>
-            <p><strong>Architecture:</strong> """ + esc(ml.get("architecture", "N/A")) + """</p>
-            <p><strong>Summary:</strong> """ + esc(shap.get("explanation_summary", "N/A")) + """</p>
+            <p><strong>Architecture:</strong> """ + _escape_html(ml.get("architecture", "N/A")) + """</p>
+            <p><strong>Summary:</strong> """ + _escape_html(shap.get("explanation_summary", "N/A")) + """</p>
             <h4>Top Malware Indicators (Pushers):</h4>
             <ul>
 """
     for pusher in shap.get("top_malware_indicators", [])[:5]:
-        html_content += f"                <li><strong>{esc(pusher.get('feature_name'))}:</strong> {esc(pusher.get('feature_value'))} (SHAP: +{pusher.get('shap_value', 0.0):.4f})</li>\n"
+        html_content += f"                <li><strong>{_escape_html(pusher.get('feature_name'))}:</strong> {_escape_html(pusher.get('feature_value'))} (SHAP: +{pusher.get('shap_value', 0.0):.4f})</li>\n"
 
     html_content += """            </ul>
         </div>
@@ -118,7 +120,7 @@ def generate_html_report(result: dict) -> str:
                 <ul>
 """
     for hmatch in heuristic.get("matches", []):
-        html_content += f"                    <li>[{esc(hmatch.get('severity'))}] <strong>{esc(hmatch.get('rule_name'))}:</strong> {esc(hmatch.get('description'))} (+{hmatch.get('weight', 0)})</li>\n"
+        html_content += f"                    <li>[{_escape_html(hmatch.get('severity'))}] <strong>{_escape_html(hmatch.get('rule_name'))}:</strong> {_escape_html(hmatch.get('description'))} (+{hmatch.get('weight', 0)})</li>\n"
 
     html_content += """                </ul>
             </div>
@@ -127,7 +129,7 @@ def generate_html_report(result: dict) -> str:
                 <ul>
 """
     for ymatch in yara.get("matches", []):
-        html_content += f"                    <li>[{esc(ymatch.get('severity'))}] <strong>{esc(ymatch.get('rule'))}</strong> ({esc(ymatch.get('category', 'General'))})</li>\n"
+        html_content += f"                    <li>[{_escape_html(ymatch.get('severity'))}] <strong>{_escape_html(ymatch.get('rule'))}</strong> ({_escape_html(ymatch.get('category', 'General'))})</li>\n"
 
     html_content += """                </ul>
             </div>
@@ -139,28 +141,28 @@ def generate_html_report(result: dict) -> str:
             <ul>
 """
     for url_item in iocs.get("urls", []):
-        html_content += f"                <li><code>{esc(url_item)}</code></li>\n"
+        html_content += f"                <li><code>{_escape_html(url_item)}</code></li>\n"
 
     html_content += """            </ul>
             <p><strong>IP Addresses (""" + str(len(iocs.get("ip_addresses", []))) + """):</strong></p>
             <ul>
 """
     for ip_item in iocs.get("ip_addresses", []):
-        html_content += f"                <li><code>{esc(ip_item)}</code></li>\n"
+        html_content += f"                <li><code>{_escape_html(ip_item)}</code></li>\n"
 
     html_content += """            </ul>
             <p><strong>Domains (""" + str(len(iocs.get("domains", []))) + """):</strong></p>
             <ul>
 """
     for dom_item in iocs.get("domains", []):
-        html_content += f"                <li><code>{esc(dom_item)}</code></li>\n"
+        html_content += f"                <li><code>{_escape_html(dom_item)}</code></li>\n"
 
     html_content += """            </ul>
             <p><strong>Registry Keys (""" + str(len(iocs.get("registry_keys", []))) + """):</strong></p>
             <ul>
 """
     for reg_item in iocs.get("registry_keys", []):
-        html_content += f"                <li><code>{esc(reg_item)}</code></li>\n"
+        html_content += f"                <li><code>{_escape_html(reg_item)}</code></li>\n"
 
     html_content += f"""            </ul>
         </div>
