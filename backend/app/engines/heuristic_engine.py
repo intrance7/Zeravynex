@@ -6,6 +6,13 @@ class HeuristicEngine:
 
     RULES = [
         {
+            "id": "HEUR_AUTHENTICODE_SIGNATURE",
+            "name": "Authenticode Digital Signature Present",
+            "severity": "SAFE",
+            "weight": -30,
+            "category": "Publisher Verification"
+        },
+        {
             "id": "HEUR_RWX_SECTION",
             "name": "Read-Write-Execute (RWX) Section Detected",
             "severity": "HIGH",
@@ -64,6 +71,22 @@ class HeuristicEngine:
         imports_exports = static_analysis_report.get("imports_exports", {})
         strings_summary = static_analysis_report.get("strings_summary", {})
         iocs = static_analysis_report.get("iocs", {})
+        pe_header = static_analysis_report.get("pe_header", {})
+
+        # 0. Check Authenticode Signature
+        security_features = pe_header.get("security_features", {})
+        if security_features.get("has_signature"):
+            matches.append({
+                "rule_id": "HEUR_AUTHENTICODE_SIGNATURE",
+                "rule_name": "Authenticode Digital Signature Present",
+                "severity": "SAFE",
+                "weight": -30,
+                "confidence": 0.99,
+                "category": "Publisher Verification",
+                "evidence": {
+                    "has_signature": True
+                }
+            })
 
         # 1. Check RWX Sections
         rwx_secs = [s for s in sections if s.get("is_rwx")]

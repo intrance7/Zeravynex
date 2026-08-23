@@ -46,7 +46,7 @@ class DecisionFusionEngine:
                 "weight": weight,
                 "details": match.get("evidence", {})
             })
-        heur_score = min(100.0, float(heur_total))
+        heur_score = max(0.0, min(100.0, float(heur_total)))
 
         # 3. YARA Score (0-100)
         yara_total = 0.0

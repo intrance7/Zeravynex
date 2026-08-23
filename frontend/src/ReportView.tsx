@@ -227,7 +227,7 @@ export default function ReportView() {
                       { label: 'MD5', val: analysisResult.hashes?.md5 },
                       { label: 'SHA1', val: analysisResult.hashes?.sha1 },
                       { label: 'SHA256', val: analysisResult.hashes?.sha256 },
-                      { label: 'Entropy', val: `${analysisResult.static_analysis?.pe_info?.entropy?.toFixed(2)} (Shannon)` },
+                      { label: 'Entropy', val: analysisResult.hashes?.entropy !== undefined ? `${analysisResult.hashes?.entropy.toFixed(2)} (Shannon)` : 'N/A' },
                     ].map(item => (
                       <div key={item.label} className="bg-background/50 border border-border rounded-md p-3">
                         <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">{item.label}</p>

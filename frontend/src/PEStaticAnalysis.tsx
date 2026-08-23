@@ -193,6 +193,7 @@ export default function PEStaticAnalysis({ peHeader, sections, hashes, metadata 
               { label: 'DEP/NX', enabled: securityFeatures.dep_nx },
               { label: 'SafeSEH', enabled: securityFeatures.no_seh },
               { label: 'CFG', enabled: securityFeatures.cfg },
+              { label: 'Authenticode', enabled: securityFeatures.has_signature },
             ].map(feat => (
               <div key={feat.label} className={cn(
                 "flex items-center gap-2 px-3 py-2 rounded-lg border text-xs font-medium",

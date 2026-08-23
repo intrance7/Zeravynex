@@ -79,6 +79,17 @@ class PEParser:
             no_seh = bool(dll_characteristics & 0x0400)
             cfg = bool(dll_characteristics & 0x4000)
 
+            # Check for Digital Signature / Authenticode
+            has_signature = False
+            try:
+                sec_dir_idx = pefile.DIRECTORY_ENTRY.get('IMAGE_DIRECTORY_ENTRY_SECURITY', 4)
+                if len(pe.OPTIONAL_HEADER.DATA_DIRECTORY) > sec_dir_idx:
+                    sec_dir = pe.OPTIONAL_HEADER.DATA_DIRECTORY[sec_dir_idx]
+                    if sec_dir.Size > 0:
+                        has_signature = True
+            except Exception:
+                pass
+
             result = {
                 "is_pe": True,
                 "architecture": arch,
@@ -95,7 +106,8 @@ class PEParser:
                     "aslr": aslr,
                     "dep_nx": dep_nx,
                     "no_seh": no_seh,
-                    "cfg": cfg
+                    "cfg": cfg,
+                    "has_signature": has_signature
                 }
             }
             pe.close()
