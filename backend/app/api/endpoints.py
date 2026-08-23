@@ -41,7 +41,8 @@ def health_check(db: Session = Depends(get_db)):
         db.execute(text("SELECT 1"))
         checks["database"] = "connected"
     except Exception as e:
-        checks["database"] = f"error: {str(e)}"
+        logger.error(f"Database connectivity check failed: {e}", exc_info=True)
+        checks["database"] = "disconnected"
 
     # 2. Check YARA Rules
     yara_rules_dir = Path(__file__).resolve().parent.parent / "yara_rules"

@@ -1,6 +1,7 @@
 import re
 from typing import Dict, List, Set, Union
 from pathlib import Path
+from urllib.parse import urlparse
 
 # Regular expressions for IOC extraction
 URL_REGEX = re.compile(r"https?://[^\s<>\"'{}|\\^`\[\]]+", re.IGNORECASE)
@@ -35,8 +36,17 @@ class IOCExtractor:
         # Extract URLs
         for match in URL_REGEX.findall(text_block):
             clean_url = match.rstrip(".,;:!)\"']")
-            if not any(clean_url.startswith(wl) for wl in URL_WHITELIST):
-                urls.add(clean_url)
+            try:
+                parsed = urlparse(clean_url)
+                hostname = (parsed.hostname or "").lower()
+                is_whitelisted_url = (
+                    any(clean_url.startswith(wl) for wl in URL_WHITELIST)
+                    or any(hostname == wl or hostname.endswith("." + wl) for wl in DOMAIN_WHITELIST)
+                )
+                if not is_whitelisted_url and parsed.scheme in ("http", "https"):
+                    urls.add(clean_url)
+            except Exception:
+                continue
 
         # Extract IPv4 Addresses
         for match in IPV4_REGEX.findall(text_block):
