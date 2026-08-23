@@ -140,11 +140,12 @@ python -m app.engines.static_analysis.cli path/to/sample.exe
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/v1/health` | Healthcheck and service status |
-| `POST` | `/api/v1/analyze` | Submit PE binary for static analysis |
-| `GET` | `/api/v1/analyses` | List recent sample analysis history |
-| `GET` | `/api/v1/analyses/{id}` | Retrieve comprehensive analysis report & SHAP attributions |
-| `DELETE` | `/api/v1/analyses/{id}` | Remove sample record and analysis data |
+| `GET` | `/api/v1/health` | Healthcheck and service readiness status |
+| `POST` | `/api/v1/analyze` | Submit PE binary for static malware analysis |
+| `GET` | `/api/v1/history` | Retrieve recent sample analysis history |
+| `GET` | `/api/v1/report/search` | Search past analyses by filename or hash |
+| `GET` | `/api/v1/report/{sha256}` | Retrieve comprehensive report by sample SHA256 hash |
+| `GET` | `/api/v1/report/id/{analysis_id}` | Retrieve analysis report by record ID |
 
 ---
 
