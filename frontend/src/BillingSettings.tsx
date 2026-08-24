@@ -52,8 +52,11 @@ export default function BillingSettings() {
             >
               Upgrade Plan
             </button>
-            <button className="flex-1 bg-muted/50 border border-border hover:bg-muted text-foreground font-semibold py-2.5 rounded-lg transition-colors text-sm">
-              Manage Billing
+            <button 
+              onClick={() => window.dispatchEvent(new CustomEvent('simulate-limit'))}
+              className="flex-1 bg-muted/50 border border-border hover:bg-muted text-foreground font-semibold py-2.5 rounded-lg transition-colors text-sm"
+            >
+              Simulate Limit
             </button>
           </div>
         </div>

@@ -11,6 +11,7 @@ import LandingPage from './LandingPage';
 import ReportView from './ReportView';
 import ComingSoon from './ComingSoon';
 import SettingsView from './SettingsView';
+import PricingView from './PricingView';
 
 import InvestigationsView from './InvestigationsView';
 import CollectionsView from './CollectionsView';
@@ -63,8 +64,9 @@ function App() {
           <Route path="collections" element={<CollectionsView />} />
           <Route path="api" element={<ComingSoon title="API" />} />
           <Route path="usage" element={<ComingSoon title="Usage" />} />
-          <Route path="billing" element={<ComingSoon title="Billing" />} />
+          <Route path="billing" element={<Navigate to="/dashboard/settings" replace />} />
           <Route path="settings" element={<SettingsView />} />
+          <Route path="pricing" element={<PricingView />} />
         </Route>
       </Routes>
     </BrowserRouter>
