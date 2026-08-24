@@ -4,6 +4,7 @@ import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import ProfileSettings from './ProfileSettings';
 import SecuritySettings from './SecuritySettings';
+import BillingSettings from './BillingSettings';
 
 export default function SettingsView() {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing' | 'team' | 'api'>('profile');
@@ -69,13 +70,7 @@ export default function SettingsView() {
             >
               {activeTab === 'profile' && <ProfileSettings />}
               {activeTab === 'security' && <SecuritySettings />}
-              {activeTab === 'billing' && (
-                <div className="text-center py-20 text-muted-foreground">
-                  <CreditCard className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                  <h3 className="text-lg font-bold text-foreground">Billing Management</h3>
-                  <p className="text-sm mt-2">Billing and subscription features will be available in Module 31.</p>
-                </div>
-              )}
+              {activeTab === 'billing' && <BillingSettings />}
               {activeTab === 'team' && (
                 <div className="text-center py-20 text-muted-foreground">
                   <Users className="w-12 h-12 mx-auto mb-4 opacity-20" />

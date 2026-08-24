@@ -8,11 +8,13 @@ import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import AIAnalystPanel from './AIAnalystPanel';
 import CommandPalette from './CommandPalette';
+import LimitReachedModal from './LimitReachedModal';
 
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState<string | undefined>();
+  const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,8 +22,15 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
       setAiPrompt(e.detail);
       setIsAIOpen(true);
     };
+    const handleSimulateLimit = () => {
+      setIsLimitModalOpen(true);
+    };
     window.addEventListener('open-ai-analyst', handleOpenAI);
-    return () => window.removeEventListener('open-ai-analyst', handleOpenAI);
+    window.addEventListener('simulate-limit', handleSimulateLimit);
+    return () => {
+      window.removeEventListener('open-ai-analyst', handleOpenAI);
+      window.removeEventListener('simulate-limit', handleSimulateLimit);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -197,6 +206,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
 
       <AIAnalystPanel isOpen={isAIOpen} onClose={() => { setIsAIOpen(false); setAiPrompt(undefined); }} initialPrompt={aiPrompt} />
       <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
+      <LimitReachedModal isOpen={isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} limitType="analyses" currentUsage={10} maxLimit={10} />
     </div>
   );
 }
