@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { KeyRound, ShieldAlert, MonitorSmartphone, Clock, LogOut, Smartphone, CheckCircle2, AlertTriangle, Github, Mail } from 'lucide-react';
+import { KeyRound, ShieldAlert, MonitorSmartphone, Clock, LogOut, Smartphone, CheckCircle2, Code } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function SecuritySettings() {
@@ -95,13 +95,13 @@ export default function SecuritySettings() {
       {/* Connected Accounts */}
       <div>
         <h3 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-          <Github className="w-5 h-5 text-primary" /> Connected Accounts
+          <Code className="w-5 h-5 text-primary" /> Connected Accounts
         </h3>
         <div className="bg-background border border-border rounded-xl overflow-hidden divide-y divide-border">
           <div className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-card border border-border rounded-md">
-                <Github className="w-4 h-4" />
+                <Code className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="font-semibold text-sm text-foreground">GitHub</h4>

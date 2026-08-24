@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Lock, User, ArrowRight, Activity, Zap, Server, Mail, ChevronLeft, Github } from 'lucide-react';
+import { Shield, Lock, User, ArrowRight, Activity, Zap, Server, Mail, ChevronLeft, Code } from 'lucide-react';
 
 export default function AuthPage({ onLogin }: { onLogin: () => void }) {
   const [authState, setAuthState] = useState<'login' | 'register' | 'forgot' | 'verify'>('login');
@@ -26,7 +26,7 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
     }, 1500);
   };
 
-  const handleSocialLogin = (provider: string) => {
+  const handleSocialLogin = (_provider: string) => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
@@ -206,7 +206,7 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                       onClick={() => handleSocialLogin('github')}
                       className="w-full flex items-center justify-center gap-3 bg-background border border-border hover:bg-muted text-foreground py-2.5 rounded-lg font-medium transition-colors text-sm"
                     >
-                      <Github className="w-4 h-4" /> Continue with GitHub
+                      <Code className="w-4 h-4" /> Continue with GitHub
                     </button>
                     <button 
                       type="button"

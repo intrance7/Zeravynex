@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { CreditCard, Download, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
+import { CreditCard, Download, CheckCircle2, AlertCircle } from 'lucide-react';
 import { PRICING_TIERS } from './config/pricing';
 import { useNavigate } from 'react-router-dom';
 

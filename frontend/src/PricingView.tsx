@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, ShieldAlert, Zap, ArrowRight, Server, Building2, CreditCard } from 'lucide-react';
+import { Check, ShieldAlert, Zap, ArrowRight, Server, Building2 } from 'lucide-react';
 import { PRICING_TIERS } from './config/pricing';
 import { cn } from './lib/utils';
 import { useNavigate } from 'react-router-dom';
