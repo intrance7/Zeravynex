@@ -10,6 +10,7 @@ import HistoryContent from './HistoryContent';
 import LandingPage from './LandingPage';
 import ReportView from './ReportView';
 import ComingSoon from './ComingSoon';
+import SettingsView from './SettingsView';
 
 import InvestigationsView from './InvestigationsView';
 import CollectionsView from './CollectionsView';
@@ -63,7 +64,7 @@ function App() {
           <Route path="api" element={<ComingSoon title="API" />} />
           <Route path="usage" element={<ComingSoon title="Usage" />} />
           <Route path="billing" element={<ComingSoon title="Billing" />} />
-          <Route path="settings" element={<ComingSoon title="Settings" />} />
+          <Route path="settings" element={<SettingsView />} />
         </Route>
       </Routes>
     </BrowserRouter>

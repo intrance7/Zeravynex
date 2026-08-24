@@ -168,7 +168,10 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
                     <div className="px-3 py-2 border-b border-border mb-1">
                       <p className="text-[11px] font-semibold text-popover-foreground truncate">admin@zeravynex.local</p>
                     </div>
-                    <button className="w-full flex items-center gap-2 px-3 py-1.5 text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+                    <button 
+                      onClick={() => { setIsProfileOpen(false); navigate('/dashboard/settings'); }}
+                      className="w-full flex items-center gap-2 px-3 py-1.5 text-[13px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    >
                       <Settings className="w-3.5 h-3.5" /> Settings
                     </button>
                     <button 

@@ -285,6 +285,19 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                       </div>
                     </div>
 
+                    {authState === 'login' && (
+                      <div className="flex items-center gap-2 pt-1">
+                        <input 
+                          type="checkbox" 
+                          id="remember" 
+                          className="w-4 h-4 rounded border-border bg-background text-primary focus:ring-primary focus:ring-offset-background"
+                        />
+                        <label htmlFor="remember" className="text-xs text-muted-foreground cursor-pointer">
+                          Remember me for 30 days
+                        </label>
+                      </div>
+                    )}
+
                     <button 
                       type="submit" 
                       disabled={isLoading}
