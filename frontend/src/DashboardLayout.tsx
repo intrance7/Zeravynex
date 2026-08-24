@@ -12,7 +12,17 @@ import CommandPalette from './CommandPalette';
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState<string | undefined>();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleOpenAI = (e: any) => {
+      setAiPrompt(e.detail);
+      setIsAIOpen(true);
+    };
+    window.addEventListener('open-ai-analyst', handleOpenAI);
+    return () => window.removeEventListener('open-ai-analyst', handleOpenAI);
+  }, []);
 
   const handleLogout = () => {
     onLogout();
@@ -182,7 +192,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
 
       </div>
 
-      <AIAnalystPanel isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
+      <AIAnalystPanel isOpen={isAIOpen} onClose={() => { setIsAIOpen(false); setAiPrompt(undefined); }} initialPrompt={aiPrompt} />
       <CommandPalette isOpen={isCommandOpen} onClose={() => setIsCommandOpen(false)} />
     </div>
   );

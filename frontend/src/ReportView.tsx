@@ -224,7 +224,7 @@ export default function ReportView() {
                     key={action}
                     onClick={() => {
                       setIsAIActionsOpen(false);
-                      // In a real implementation this would emit an event or update global state to open the AI panel.
+                      window.dispatchEvent(new CustomEvent('open-ai-analyst', { detail: action }));
                     }}
                     className="w-full text-left px-3 py-2 text-[12px] text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
                   >

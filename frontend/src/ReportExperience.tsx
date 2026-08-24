@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FileText, Download, Share2, FileJson, CheckCircle2, AlertTriangle, ArrowRight, ShieldAlert, Cpu } from 'lucide-react';
+import { FileText, Download, Share2, FileJson, CheckCircle2, AlertTriangle, ArrowRight, ShieldAlert, Cpu, BrainCircuit } from 'lucide-react';
 import { toast } from 'sonner';
 
 const REPORT_TYPES = [
@@ -112,6 +112,27 @@ export default function ReportExperience() {
               <button className="w-full flex items-center justify-center gap-2 text-primary hover:text-primary/80 font-medium text-sm transition-colors">
                 <Share2 className="w-4 h-4" /> Share via Link
               </button>
+            </div>
+          </div>
+
+          <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+            <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+              <BrainCircuit className="w-5 h-5 text-primary" /> AI Actions
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {[
+                'Explain Verdict', 'Summarize Sample', 'Explain IOC', 
+                'Map to MITRE', 'Suggest Investigation Steps',
+                'Generate SOC Report', 'Generate Executive Summary'
+              ].map(action => (
+                <button 
+                  key={action}
+                  onClick={() => window.dispatchEvent(new CustomEvent('open-ai-analyst', { detail: action }))}
+                  className="flex items-center justify-center text-center p-3 rounded-lg border border-border bg-muted/30 hover:bg-muted hover:border-primary/50 text-xs text-foreground transition-all"
+                >
+                  {action}
+                </button>
+              ))}
             </div>
           </div>
         </div>

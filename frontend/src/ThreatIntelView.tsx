@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, ShieldAlert, Globe, 
-  Database, GitBranch, ArrowRight, ShieldCheck, FileText
+  Database, GitBranch, ArrowRight, ShieldCheck, FileText, Activity, Network
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { CopyButton } from './CopyButton';
@@ -238,6 +238,50 @@ export default function ThreatIntelView() {
                         <div key={t.id} className="flex items-center gap-2 px-3 py-1.5 bg-muted/30 border border-border rounded-md text-xs">
                           <span className="font-mono text-primary font-bold">{t.id}</span>
                           <span className="text-foreground">{t.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Historical Observations */}
+                  <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-2">
+                      <Activity className="w-3.5 h-3.5" /> Historical Observations
+                    </h3>
+                    <div className="relative pl-4 border-l-2 border-border/50 space-y-4">
+                      {[
+                        { date: '2026-08-22', text: 'Associated with Emotet campaign targeting healthcare sector.' },
+                        { date: '2026-06-14', text: 'First seen resolving to known Cobalt Strike Team Server.' },
+                        { date: '2025-11-03', text: 'Registered via Namecheap.' }
+                      ].map((obs, i) => (
+                        <div key={i} className="relative">
+                          <div className="absolute -left-[21px] top-1 w-2.5 h-2.5 rounded-full bg-primary/40 border-2 border-card"></div>
+                          <p className="text-[10px] font-mono text-muted-foreground font-bold mb-0.5">{obs.date}</p>
+                          <p className="text-sm text-foreground">{obs.text}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Relationships */}
+                  <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-2">
+                      <Network className="w-3.5 h-3.5" /> Known Relationships
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {[
+                        { type: 'Domain', val: 'malicious-c2.net', icon: Globe },
+                        { type: 'Hash', val: 'e3b0c44298fc...', icon: FileText },
+                        { type: 'Actor', val: 'APT29', icon: ShieldAlert }
+                      ].map((rel, i) => (
+                        <div key={i} className="flex items-center gap-2 p-2 border border-border bg-muted/20 rounded-lg pr-4">
+                          <div className="p-1.5 bg-background rounded-md border border-border">
+                            <rel.icon className="w-3 h-3 text-primary" />
+                          </div>
+                          <div>
+                            <p className="text-[9px] uppercase tracking-wider font-bold text-muted-foreground">{rel.type}</p>
+                            <p className="text-xs font-mono font-medium">{rel.val}</p>
+                          </div>
                         </div>
                       ))}
                     </div>

@@ -79,8 +79,8 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
           items: ['SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', 'CurrentVersion\\Run'],
           mitre: 'T1547.001'
         };
-      } else if (text.toLowerCase().includes('summarize')) {
-        aiContent = "This sample is a packed 32-bit executable. Upon execution, it is highly likely to unpack a secondary payload into memory using process injection, and it contains hardcoded IPs for command and control.";
+      } else if (text.toLowerCase().includes('summarize') || text.toLowerCase().includes('executive')) {
+        aiContent = "This sample is a packed 32-bit executable. Upon execution, it is highly likely to unpack a secondary payload into memory using process injection, and it contains hardcoded IPs for command and control. Executive summary: High threat, immediate containment of affected hosts recommended.";
       } else if (text.toLowerCase().includes('investigate') || text.toLowerCase().includes('steps')) {
         aiContent = "I recommend the following immediate investigation steps:\n\n1. Pivot on the extracted IP addresses to check for associated threat campaigns.\n2. Detonate the binary in a secure sandbox to capture the unpacked payload.\n3. Search your SIEM for any endpoints communicating with the C2 URLs.";
       } else if (text.toLowerCase().includes('ioc')) {
@@ -96,6 +96,10 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
           label: 'MITRE ATT&CK Mappings',
           items: ['Process Injection (T1055)', 'Web Protocols (T1071.001)', 'Registry Run Keys (T1547.001)']
         };
+      } else if (text.toLowerCase().includes('soc report')) {
+        aiContent = "### SOC Incident Report Draft\n\n**Incident:** Suspicious executable execution\n**Severity:** High\n**Indicators:** `192.168.100.45`, `malicious-c2.net`\n**Summary:** The binary uses process hollowing (T1055) to inject malicious code and establish C2. Persistence is achieved via Run keys.\n**Actions Taken:** None yet. Await analyst confirmation.";
+      } else if (text.toLowerCase().includes('explain verdict')) {
+        aiContent = "The 'CRITICAL' verdict was assigned due to the combination of high-entropy packing, process injection APIs (VirtualAlloc, WriteProcessMemory), and embedded malicious C2 domains. These features strongly correlate with ransomware or APT tooling.";
       } else {
         aiContent = "I can see the relevant static features. Is there a specific aspect (like IOCs, API imports, or MITRE tactics) you'd like me to explain?";
       }
@@ -109,10 +113,13 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
   };
 
   const quickPrompts = [
-    "Why was this classified as critical?",
-    "What persistence mechanisms were found?",
-    "Summarize the attack chain.",
-    "What should I investigate next?"
+    "Explain Verdict",
+    "Summarize Sample",
+    "Explain IOC",
+    "Map to MITRE",
+    "Generate SOC Report",
+    "Generate Executive Summary",
+    "Suggest Investigation Steps"
   ];
 
   return (
