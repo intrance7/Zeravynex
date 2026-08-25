@@ -193,5 +193,4 @@ For vulnerability disclosures and reporting procedures, please refer to [SECURIT
 
 ## 📄 License
 
-
 This project is licensed under the terms of the [MIT License](LICENSE).
