@@ -18,6 +18,8 @@ import CollectionsView from './CollectionsView';
 import ReportExperience from './ReportExperience';
 import ThreatGraphView from './ThreatGraphView';
 import ThreatIntelView from './ThreatIntelView';
+import ErrorState from './ErrorState';
+import { ShieldAlert } from 'lucide-react';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -68,6 +70,21 @@ function App() {
           <Route path="settings" element={<SettingsView />} />
           <Route path="pricing" element={<PricingView />} />
         </Route>
+
+        {/* Global 404 Error Route */}
+        <Route 
+          path="*" 
+          element={
+            <div className="h-screen w-full flex items-center justify-center bg-background">
+              <ErrorState 
+                icon={<ShieldAlert className="w-10 h-10 text-destructive" />}
+                title="404 - Page Not Found" 
+                description="The page you are looking for does not exist or has been moved." 
+                action={{ label: 'Return to Dashboard', onClick: () => window.location.href = '/dashboard' }} 
+              />
+            </div>
+          } 
+        />
       </Routes>
     </BrowserRouter>
   );

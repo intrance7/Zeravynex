@@ -10,6 +10,9 @@ import ImportAnalysis from './ImportAnalysis';
 import IocCenter from './IocCenter';
 import MitreAttackView from './MitreAttackView';
 import ThreatGraphView from './ThreatGraphView';
+import { SkeletonReport } from './components/SkeletonComponents';
+import ErrorState from './ErrorState';
+import { useNavigate } from 'react-router-dom';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
@@ -20,7 +23,9 @@ export default function ReportView() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [isAIActionsOpen, setIsAIActionsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTarget = async () => {
@@ -43,10 +48,15 @@ export default function ReportView() {
           if (res.ok) {
             const data = await res.json();
             setAnalysisResult(data);
+          } else {
+            setError("Analysis unavailable");
           }
+        } else {
+          setError("No active analysis");
         }
       } catch (err) {
         console.error("Failed to load dashboard data:", err);
+        setError("Backend connection lost");
       } finally {
         setLoading(false);
       }
@@ -57,14 +67,20 @@ export default function ReportView() {
 
   if (loading) {
     return (
-      <div className="p-8 max-w-7xl mx-auto w-full animate-pulse space-y-6">
-        <div className="h-32 bg-muted/30 rounded-2xl border border-border"></div>
-        <div className="flex gap-4">
-          <div className="h-10 w-32 bg-muted/30 rounded-lg"></div>
-          <div className="h-10 w-32 bg-muted/30 rounded-lg"></div>
-          <div className="h-10 w-32 bg-muted/30 rounded-lg"></div>
-        </div>
-        <div className="h-[500px] bg-muted/30 rounded-2xl border border-border"></div>
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto w-full">
+        <SkeletonReport />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 md:p-8 max-w-[1400px] mx-auto w-full h-full flex items-center justify-center">
+        <ErrorState 
+          title={error} 
+          description={error === 'Backend connection lost' ? 'Could not connect to the analysis cluster. Please check your network or try again.' : 'The requested report could not be found or generated.'} 
+          action={{ label: 'Go to Dashboard', onClick: () => navigate('/dashboard') }} 
+        />
       </div>
     );
   }

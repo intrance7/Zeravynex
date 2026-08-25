@@ -3,13 +3,23 @@ import { UploadCloud, Settings, Server, Lock, Cpu, Activity } from 'lucide-react
 import { cn } from './lib/utils';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_BASE = 'http://localhost:8000/api/v1';
+
+const ANALYSIS_STEPS = [
+  "Preparing sample",
+  "Extracting metadata",
+  "Building indicators",
+  "Generating findings",
+  "Preparing report"
+];
 
 export default function AnalysisContent() {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -56,10 +66,18 @@ export default function AnalysisContent() {
     if (!selectedFile) return;
 
     setIsUploading(true);
+    setAnalysisStep(0);
     const formData = new FormData();
     formData.append('file', selectedFile);
     
-    toast.loading('Initializing analysis environment...', { id: 'upload' });
+    // Simulate step progression visually
+    let step = 0;
+    const stepInterval = setInterval(() => {
+      step++;
+      if (step < ANALYSIS_STEPS.length) {
+        setAnalysisStep(step);
+      }
+    }, 1500);
 
     try {
       const res = await fetch(`${API_BASE}/analyze`, {
@@ -70,18 +88,20 @@ export default function AnalysisContent() {
       const data = await res.json();
       
       if (!res.ok) {
-        toast.error(`Analysis failed: ${data.detail || 'Unknown error'}`, { id: 'upload' });
+        clearInterval(stepInterval);
+        toast.error(`Analysis failed: ${data.detail || 'Unknown error'}`);
         setIsUploading(false);
         return;
       }
 
       if (data.status === 'completed') {
-        toast.success(`Analysis Complete: Verdict ${data.verdict}`, { id: 'upload' });
-        navigate('/dashboard/report', { state: { sha256: data.sha256 } });
+        clearInterval(stepInterval);
+        setAnalysisStep(ANALYSIS_STEPS.length - 1);
+        setTimeout(() => {
+          toast.success(`Analysis Complete: Verdict ${data.verdict}`);
+          navigate('/dashboard/report', { state: { sha256: data.sha256 } });
+        }, 500);
       } else if (data.status === 'queued' && data.task_id) {
-        // Polling worker task until complete
-        toast.loading('Queued on analysis cluster. Processing...', { id: 'upload' });
-        
         let attempts = 0;
         const pollInterval = setInterval(async () => {
           attempts++;
@@ -91,11 +111,16 @@ export default function AnalysisContent() {
               const taskData = await taskRes.json();
               if (taskData.status === 'completed') {
                 clearInterval(pollInterval);
-                toast.success(`Analysis Complete: Verdict ${taskData.result?.verdict || 'DONE'}`, { id: 'upload' });
-                navigate('/dashboard/report', { state: { sha256: taskData.result?.sha256 } });
+                clearInterval(stepInterval);
+                setAnalysisStep(ANALYSIS_STEPS.length - 1);
+                setTimeout(() => {
+                  toast.success(`Analysis Complete: Verdict ${taskData.result?.verdict || 'DONE'}`);
+                  navigate('/dashboard/report', { state: { sha256: taskData.result?.sha256 } });
+                }, 500);
               } else if (taskData.status === 'failed') {
                 clearInterval(pollInterval);
-                toast.error(`Worker failed: ${taskData.error || 'Execution error'}`, { id: 'upload' });
+                clearInterval(stepInterval);
+                toast.error(`Worker failed: ${taskData.error || 'Execution error'}`);
                 setIsUploading(false);
               }
             }
@@ -103,16 +128,18 @@ export default function AnalysisContent() {
             console.error("Poll error:", pollErr);
           }
 
-          if (attempts > 60) { // 60 seconds timeout
+          if (attempts > 60) {
             clearInterval(pollInterval);
-            toast.error('Analysis timed out. Check history later.', { id: 'upload' });
+            clearInterval(stepInterval);
+            toast.error('Analysis timed out. Check history later.');
             setIsUploading(false);
           }
         }, 1000);
       }
     } catch (err) {
       console.error(err);
-      toast.error('Failed to establish connection with analysis cluster.', { id: 'upload' });
+      clearInterval(stepInterval);
+      toast.error('Failed to establish connection with analysis cluster.');
       setIsUploading(false);
     }
   };
@@ -144,15 +171,46 @@ export default function AnalysisContent() {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              className="hidden" 
-              onChange={handleChange} 
-              accept=".exe,.dll,.sys"
-            />
-
-            {!selectedFile ? (
+            <AnimatePresence mode="wait">
+              {isUploading ? (
+                <motion.div 
+                  key="uploading"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  className="w-full flex flex-col items-center justify-center py-8 z-10 relative"
+                >
+                  <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-6 shadow-inner relative overflow-hidden">
+                    <div className="absolute inset-0 bg-primary/20 animate-pulse"></div>
+                    <Cpu className="w-10 h-10 text-primary relative z-10" />
+                  </div>
+                  <h3 className="text-xl font-bold text-foreground mb-2">Analyzing Payload</h3>
+                  <div className="w-full max-w-sm mb-2 text-center h-6">
+                    <AnimatePresence mode="wait">
+                      <motion.p
+                        key={analysisStep}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="text-sm font-semibold text-primary"
+                      >
+                        {ANALYSIS_STEPS[Math.min(analysisStep, ANALYSIS_STEPS.length - 1)]}...
+                      </motion.p>
+                    </AnimatePresence>
+                  </div>
+                  <div className="w-full max-w-sm h-2 bg-muted rounded-full overflow-hidden mb-4">
+                    <motion.div 
+                      className="h-full bg-primary"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${Math.min(((analysisStep + 1) / ANALYSIS_STEPS.length) * 100, 100)}%` }}
+                      transition={{ duration: 0.5 }}
+                    ></motion.div>
+                  </div>
+                  <p className="text-xs text-muted-foreground font-mono bg-background/50 px-2 py-1 rounded border border-border">
+                    {selectedFile?.name}
+                  </p>
+                </motion.div>
+              ) : !selectedFile ? (
               <>
                 <div className="w-16 h-16 rounded-xl bg-background flex items-center justify-center mb-6 border border-border shadow-sm">
                   <UploadCloud className="w-8 h-8 text-muted-foreground" />
@@ -201,7 +259,16 @@ export default function AnalysisContent() {
                   </button>
                 </div>
               </div>
-            )}
+              )}
+            </AnimatePresence>
+            
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              onChange={handleChange} 
+              accept=".exe,.dll,.sys"
+            />
             
             {/* Ambient Background for Drag Area */}
             {dragActive && (

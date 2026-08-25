@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { 
   Shield, Activity, Database, Settings, 
-  LogOut, User as UserIcon, Search, Bell, Hexagon, Terminal, Network
+  LogOut, User as UserIcon, Search, Bell, Hexagon, Terminal, Network, Menu
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -18,7 +18,9 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [showUsageBanner, setShowUsageBanner] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleOpenAI = (e: any) => {
@@ -40,6 +42,11 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
     onLogout();
     navigate('/login');
   };
+
+  // Close sidebar when navigating on mobile
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   const [isCommandOpen, setIsCommandOpen] = useState(false);
 
@@ -72,8 +79,19 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
       
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 lg:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar - Compact & Utilitarian */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col justify-between z-20 shrink-0 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)]">
+      <aside className={cn(
+        "w-64 bg-card border-r border-border flex flex-col justify-between z-40 shrink-0 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)] transition-transform duration-300 absolute lg:relative h-full",
+        isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      )}>
         
         {/* Brand */}
         <div>
@@ -130,17 +148,27 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
       <div className="flex-1 flex flex-col relative overflow-hidden bg-background">
         
         {/* Top Header */}
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 z-20 shrink-0">
+        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6 z-20 shrink-0">
           
+          <div className="flex items-center gap-2 lg:hidden mr-2">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+          </div>
+
           {/* Search Bar */}
           <div className="flex-1 max-w-xl flex items-center">
             <button 
               onClick={() => setIsCommandOpen(true)}
               className="relative w-full flex items-center bg-background border border-border rounded-md py-1.5 pl-3 pr-4 text-sm text-muted-foreground/70 hover:border-primary/50 transition-all font-mono shadow-inner text-left"
             >
-              <Search className="w-4 h-4 mr-2" />
-              Search by SHA256, Tag, or IP...
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+              <Search className="w-4 h-4 mr-2 shrink-0" />
+              <span className="truncate hidden sm:inline">Search by SHA256, Tag, or IP...</span>
+              <span className="truncate sm:hidden">Search...</span>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden md:flex gap-1">
                 <kbd className="px-1.5 py-0.5 bg-card rounded text-[10px] text-muted-foreground border border-border font-mono">Ctrl</kbd>
                 <kbd className="px-1.5 py-0.5 bg-card rounded text-[10px] text-muted-foreground border border-border font-mono">K</kbd>
               </div>

@@ -255,8 +255,8 @@ export default function HistoryContent() {
           </div>
         )}
 
-        <div className="flex-1 overflow-auto">
-          <table className="w-full text-sm text-left whitespace-nowrap">
+        <div className="flex-1 overflow-auto w-full">
+          <table className="w-full text-sm text-left whitespace-nowrap min-w-[800px]">
             <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/50 border-b border-border sticky top-0 z-20 backdrop-blur-md">
               <tr>
                 <th className="px-4 py-4 w-12 text-center"></th>
