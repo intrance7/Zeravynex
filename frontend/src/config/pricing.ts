@@ -1,3 +1,5 @@
+export type SubscriptionState = 'Free' | 'Trial' | 'Active' | 'Past Due' | 'Paused' | 'Canceled' | 'Expired';
+
 export type TierLimits = {
   analyses: number | 'Unlimited';
   historyDays: number | 'Unlimited';
