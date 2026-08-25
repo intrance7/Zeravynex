@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CreditCard, Download, CheckCircle2, AlertCircle, RefreshCw, XCircle, PauseCircle, PlayCircle, Clock } from 'lucide-react';
-import { PRICING_TIERS, SubscriptionState } from './config/pricing';
+import { PRICING_TIERS, SUBSCRIPTION_STATES, type SubscriptionState } from './config/pricing';
 import { useNavigate } from 'react-router-dom';
 import { RazorpayProvider } from './lib/payments';
 
@@ -293,7 +293,7 @@ export default function BillingSettings() {
         <div className="p-4 border border-border border-dashed rounded-lg bg-card/50">
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Dev Tools: Test States</p>
           <div className="flex flex-wrap gap-2">
-            {(['Free', 'Trial', 'Active', 'Past Due', 'Paused', 'Canceled', 'Expired'] as SubscriptionState[]).map(state => (
+            {SUBSCRIPTION_STATES.map(state => (
               <button 
                 key={state} 
                 onClick={() => setSubState(state)}

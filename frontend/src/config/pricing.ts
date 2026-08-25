@@ -1,4 +1,5 @@
-export type SubscriptionState = 'Free' | 'Trial' | 'Active' | 'Past Due' | 'Paused' | 'Canceled' | 'Expired';
+export const SUBSCRIPTION_STATES = ['Free', 'Trial', 'Active', 'Past Due', 'Paused', 'Canceled', 'Expired'] as const;
+export type SubscriptionState = typeof SUBSCRIPTION_STATES[number];
 
 export type TierLimits = {
   analyses: number | 'Unlimited';
