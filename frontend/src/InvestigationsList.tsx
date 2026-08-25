@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Search, Plus, Calendar, FileText, ArrowRight } from 'lucide-react';
+import { Search, Plus, Calendar, FileText, ArrowRight, FolderSearch } from 'lucide-react';
+import EmptyState from './EmptyState';
 
 const MOCK_INVESTIGATIONS = [
   { id: 'inv-1', title: 'Operation Nightfall', status: 'Active', updated: '2 hours ago', artifacts: 12 },
@@ -13,6 +14,7 @@ interface InvestigationsListProps {
 
 export default function InvestigationsList({ onSelect }: InvestigationsListProps) {
   const [search, setSearch] = useState('');
+  const [investigations, setInvestigations] = useState(MOCK_INVESTIGATIONS);
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
@@ -37,29 +39,51 @@ export default function InvestigationsList({ onSelect }: InvestigationsListProps
         />
       </div>
 
-      <div className="grid gap-4">
-        {MOCK_INVESTIGATIONS.map(inv => (
-          <div 
-            key={inv.id} 
-            className="bg-card border border-border hover:border-primary/50 p-5 rounded-xl cursor-pointer transition-all hover:shadow-md group flex items-center justify-between"
-            onClick={() => onSelect(inv.id)}
-          >
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
-                {inv.title}
-                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${inv.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-muted text-muted-foreground border border-border'}`}>
-                  {inv.status}
-                </span>
-              </h3>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Last updated {inv.updated}</span>
-                <span className="flex items-center gap-1.5"><FileText className="w-4 h-4" /> {inv.artifacts} artifacts</span>
+      {investigations.length === 0 ? (
+        <EmptyState 
+          icon={<FolderSearch className="w-8 h-8" />}
+          title="No investigations yet."
+          description="Create an investigation to organize samples, IOCs and findings around a security case."
+          action={{
+            label: 'New Investigation',
+            onClick: () => setInvestigations(MOCK_INVESTIGATIONS) // Mock adding an investigation back
+          }}
+        />
+      ) : (
+        <div className="grid gap-4">
+          {investigations.map(inv => (
+            <div 
+              key={inv.id} 
+              className="bg-card border border-border hover:border-primary/50 p-5 rounded-xl cursor-pointer transition-all hover:shadow-md group flex items-center justify-between"
+              onClick={() => onSelect(inv.id)}
+            >
+              <div className="flex flex-col gap-1">
+                <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors flex items-center gap-2">
+                  {inv.title}
+                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${inv.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-muted text-muted-foreground border border-border'}`}>
+                    {inv.status}
+                  </span>
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4" /> Last updated {inv.updated}</span>
+                  <span className="flex items-center gap-1.5"><FileText className="w-4 h-4" /> {inv.artifacts} artifacts</span>
+                </div>
               </div>
+              <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transform group-hover:translate-x-1 transition-all" />
             </div>
-            <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transform group-hover:translate-x-1 transition-all" />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
+      
+      {/* Developer tool to clear list */}
+      {investigations.length > 0 && (
+        <button 
+          onClick={() => setInvestigations([])}
+          className="mt-8 text-xs text-muted-foreground hover:text-destructive underline"
+        >
+          Dev: Clear investigations
+        </button>
+      )}
     </div>
   );
 }

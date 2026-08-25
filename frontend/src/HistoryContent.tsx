@@ -4,6 +4,7 @@ import { cn } from './lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import EmptyState from './EmptyState';
 
 const API_BASE = 'http://localhost:8000/api/v1';
 
@@ -348,8 +349,14 @@ export default function HistoryContent() {
                 })
               ) : (
                 <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-muted-foreground">
-                    {!loading && "No historical analysis records match your filters."}
+                  <td colSpan={7} className="p-0">
+                    {!loading && (
+                      <EmptyState 
+                        icon={<Database className="w-8 h-8" />}
+                        title="No analysis history found."
+                        description="There are no historical records matching your current filters. Try adjusting your search criteria or submit a new analysis."
+                      />
+                    )}
                   </td>
                 </tr>
               )}

@@ -27,7 +27,7 @@ export default function LimitReachedModal({
   const contentMap = {
     analyses: {
       title: "Monthly Analysis Limit Reached",
-      description: "You've reached your monthly analysis limit for your current plan. Upgrade your workspace to continue analyzing new files and URLs immediately.",
+      description: "You've reached your monthly analysis limit. Upgrade to continue analyzing private samples.",
       metric: `${currentUsage} / ${maxLimit} Analyses`
     },
     history: {

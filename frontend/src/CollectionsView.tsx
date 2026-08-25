@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Folder, Search, Plus, Calendar, Tag, Share2, MoreVertical, FileArchive } from 'lucide-react';
+import { Folder, Search, Plus, Calendar, Tag, Share2, MoreVertical, FileArchive, Library } from 'lucide-react';
+import EmptyState from './EmptyState';
 
 const MOCK_COLLECTIONS = [
   { id: 'c-1', name: 'Ransomware Research', tags: ['Research', 'High Priority'], count: 124, updated: '1 hour ago', shared: true, icon: FileArchive, color: 'text-rose-400' },
@@ -11,6 +12,7 @@ const MOCK_COLLECTIONS = [
 
 export default function CollectionsView() {
   const [search, setSearch] = useState('');
+  const [collections, setCollections] = useState(MOCK_COLLECTIONS);
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
@@ -35,47 +37,69 @@ export default function CollectionsView() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {MOCK_COLLECTIONS.map(collection => {
-          const Icon = collection.icon;
-          return (
-            <div key={collection.id} className="bg-card border border-border hover:border-primary/50 rounded-xl p-6 transition-all hover:shadow-lg group flex flex-col cursor-pointer">
-              <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 rounded-lg bg-muted/50 border border-border/50 group-hover:bg-muted transition-colors ${collection.color}`}>
-                  <Icon className="w-6 h-6" />
+      {collections.length === 0 ? (
+        <EmptyState 
+          icon={<Library className="w-8 h-8" />}
+          title="No collections yet."
+          description="Create a collection to organize your malware samples, analysis reports, and threat indicators."
+          action={{
+            label: 'New Collection',
+            onClick: () => setCollections(MOCK_COLLECTIONS)
+          }}
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {collections.map(collection => {
+            const Icon = collection.icon;
+            return (
+              <div key={collection.id} className="bg-card border border-border hover:border-primary/50 rounded-xl p-6 transition-all hover:shadow-lg group flex flex-col cursor-pointer">
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`p-3 rounded-lg bg-muted/50 border border-border/50 group-hover:bg-muted transition-colors ${collection.color}`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <button className="text-muted-foreground hover:text-foreground p-1 transition-colors">
+                    <MoreVertical className="w-5 h-5" />
+                  </button>
                 </div>
-                <button className="text-muted-foreground hover:text-foreground p-1 transition-colors">
-                  <MoreVertical className="w-5 h-5" />
-                </button>
-              </div>
-              
-              <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{collection.name}</h3>
-              
-              <div className="flex flex-wrap gap-2 mb-6 flex-1">
-                {collection.tags.map(tag => (
-                  <span key={tag} className="text-[10px] uppercase font-bold text-muted-foreground bg-muted border border-border/50 px-2 py-1 rounded-full flex items-center gap-1">
-                    <Tag className="w-3 h-3" /> {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border/50">
-                <span className="font-medium">{collection.count} items</span>
-                <div className="flex items-center gap-4 text-xs">
-                  <span className="flex items-center gap-1" title="Last updated">
-                    <Calendar className="w-3.5 h-3.5" /> {collection.updated}
-                  </span>
-                  {collection.shared && (
-                    <span className="flex items-center gap-1 text-primary" title="Shared collection">
-                      <Share2 className="w-3.5 h-3.5" />
+                
+                <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{collection.name}</h3>
+                
+                <div className="flex flex-wrap gap-2 mb-6 flex-1">
+                  {collection.tags.map(tag => (
+                    <span key={tag} className="text-[10px] uppercase font-bold text-muted-foreground bg-muted border border-border/50 px-2 py-1 rounded-full flex items-center gap-1">
+                      <Tag className="w-3 h-3" /> {tag}
                     </span>
-                  )}
+                  ))}
+                </div>
+
+                <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border/50">
+                  <span className="font-medium">{collection.count} items</span>
+                  <div className="flex items-center gap-4 text-xs">
+                    <span className="flex items-center gap-1" title="Last updated">
+                      <Calendar className="w-3.5 h-3.5" /> {collection.updated}
+                    </span>
+                    {collection.shared && (
+                      <span className="flex items-center gap-1 text-primary" title="Shared collection">
+                        <Share2 className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Developer tool to clear list */}
+      {collections.length > 0 && (
+        <button 
+          onClick={() => setCollections([])}
+          className="mt-8 text-xs text-muted-foreground hover:text-destructive underline block"
+        >
+          Dev: Clear collections
+        </button>
+      )}
     </div>
   );
 }

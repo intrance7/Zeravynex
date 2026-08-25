@@ -9,12 +9,15 @@ import { AnimatePresence, motion } from 'framer-motion';
 import AIAnalystPanel from './AIAnalystPanel';
 import CommandPalette from './CommandPalette';
 import LimitReachedModal from './LimitReachedModal';
+import NotificationCenter from './NotificationCenter';
 
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState<string | undefined>();
   const [isLimitModalOpen, setIsLimitModalOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [showUsageBanner, setShowUsageBanner] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -147,10 +150,16 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
           {/* Right Actions */}
           <div className="flex items-center gap-5 pl-6">
             
-            <button className="text-muted-foreground hover:text-foreground transition-colors relative focus:outline-none">
-              <Bell className="w-4 h-4" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full border-2 border-card"></span>
-            </button>
+            <div className="relative">
+              <button 
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className="text-muted-foreground hover:text-foreground transition-colors relative focus:outline-none"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full border-2 border-card"></span>
+              </button>
+              <NotificationCenter isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+            </div>
 
             <div className="h-5 w-px bg-border"></div>
 
@@ -199,6 +208,44 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
 
         {/* Content Outlet */}
         <main className="flex-1 overflow-y-auto bg-background scroll-smooth">
+          {/* Usage Limit Banner (80% approaching) */}
+          <AnimatePresence>
+            {showUsageBanner && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-warning/10 border-b border-warning/20 px-6 py-3 flex items-center justify-between overflow-hidden"
+              >
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-8 h-8 rounded-full bg-warning/20 flex items-center justify-center shrink-0">
+                    <Activity className="w-4 h-4 text-warning" />
+                  </div>
+                  <div className="flex-1 max-w-xl">
+                    <p className="text-sm font-semibold text-warning-foreground">You've used 80% of your monthly analyses.</p>
+                    <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden mt-1.5">
+                      <div className="h-full bg-warning transition-all" style={{ width: '80%' }}></div>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <button 
+                    onClick={() => setShowUsageBanner(false)} 
+                    className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Dismiss
+                  </button>
+                  <button 
+                    onClick={() => navigate('/dashboard/pricing')}
+                    className="bg-warning text-warning-foreground hover:bg-warning/90 px-3 py-1.5 rounded text-xs font-bold transition-colors"
+                  >
+                    View Plans
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
           <Outlet />
         </main>
 
