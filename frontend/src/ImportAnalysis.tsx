@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from './lib/utils';
+import { useDebounce } from './lib/hooks/useDebounce';
 import {
   Search, ChevronDown, ChevronRight, Shield, AlertTriangle, Cpu,
   HardDrive, Globe, FolderCog, FileKey, Lock, Eye, Layers, Filter,
@@ -41,7 +42,8 @@ const getSeverity = (category: string) => {
 
 export default function ImportAnalysis({ importsExports }: ImportAnalysisProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('all');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'suspicious'>('all');
   const [expandedDlls, setExpandedDlls] = useState<Set<string>>(new Set());
   const [expandAll, setExpandAll] = useState(false);
 
@@ -71,7 +73,7 @@ export default function ImportAnalysis({ importsExports }: ImportAnalysisProps) 
   const filteredDlls = useMemo(() => {
     const dllEntries = Object.entries(imports) as [string, string[]][];
     return dllEntries.filter(([dll, funcs]) => {
-      const q = searchQuery.toLowerCase();
+      const q = debouncedSearchQuery.toLowerCase();
       const matchesSearch = !q
         || dll.toLowerCase().includes(q)
         || funcs.some(f => f.toLowerCase().includes(q));
@@ -86,7 +88,7 @@ export default function ImportAnalysis({ importsExports }: ImportAnalysisProps) 
         return info && info.category === activeFilter;
       });
     }).sort(([a], [b]) => a.localeCompare(b));
-  }, [imports, searchQuery, activeFilter, suspiciousLookup]);
+  }, [imports, debouncedSearchQuery, activeFilter, suspiciousLookup]);
 
   const toggleDll = (dll: string) => {
     setExpandedDlls(prev => {
