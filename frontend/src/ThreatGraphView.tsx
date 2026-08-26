@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { Maximize2, ZoomIn, ZoomOut, Search } from 'lucide-react';
+import { useDebounce } from './lib/hooks/useDebounce';
 
 interface ThreatGraphViewProps {
   data?: any;
@@ -45,6 +46,7 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const containerRef = useRef<HTMLDivElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
   useEffect(() => {
     setGraphData(data && Object.keys(data).length > 0 ? data : generateSampleGraphData());
@@ -92,8 +94,8 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
     const isHovered = node === hoverNode;
     
     // Dim if searching and no match
-    const isSearchMatch = searchQuery && node.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const isDimmed = searchQuery && !isSearchMatch && !isHighlighted;
+    const isSearchMatch = debouncedSearchQuery && node.name.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
+    const isDimmed = debouncedSearchQuery && !isSearchMatch && !isHighlighted;
     
     const size = node.val || 5;
     
@@ -124,7 +126,7 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
       ctx.fillText(label, node.x, node.y + size + fontSize);
     }
-  }, [highlightNodes, hoverNode, searchQuery]);
+  }, [highlightNodes, hoverNode, debouncedSearchQuery]);
 
   const handleZoomIn = () => fgRef.current?.zoom(fgRef.current.zoom() * 1.2, 400);
   const handleZoomOut = () => fgRef.current?.zoom(fgRef.current.zoom() / 1.2, 400);

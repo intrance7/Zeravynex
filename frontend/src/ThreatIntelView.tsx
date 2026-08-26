@@ -6,16 +6,23 @@ import {
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import { CopyButton } from './CopyButton';
+import { useDebounce } from './lib/hooks/useDebounce';
+import { useEffect } from 'react';
 
 export default function ThreatIntelView() {
   const [query, setQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [hasResults, setHasResults] = useState(false);
 
-  const handleSearch = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!query.trim()) return;
-    
+  const debouncedQuery = useDebounce(query, 500);
+
+  useEffect(() => {
+    if (debouncedQuery.trim()) {
+      executeSearch();
+    }
+  }, [debouncedQuery]);
+
+  const executeSearch = () => {
     setIsSearching(true);
     setHasResults(false);
     
@@ -24,6 +31,12 @@ export default function ThreatIntelView() {
       setIsSearching(false);
       setHasResults(true);
     }, 1500);
+  };
+
+  const handleSearch = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (!query.trim()) return;
+    executeSearch();
   };
 
   return (

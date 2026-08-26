@@ -5,8 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import EmptyState from './EmptyState';
-
-const API_BASE = 'http://localhost:8000/api/v1';
+import { historyService } from './services/historyService';
 
 export default function HistoryContent() {
   const [history, setHistory] = useState<any[]>([]);
@@ -35,9 +34,8 @@ export default function HistoryContent() {
   const fetchHistory = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/history?skip=${page * limit}&limit=${limit}`);
-      if (res.ok) {
-        const data = await res.json();
+      const data = await historyService.getHistory(page, limit);
+      if (data && Array.isArray(data)) {
         setHistory(data);
       } else {
         generateMockHistory();

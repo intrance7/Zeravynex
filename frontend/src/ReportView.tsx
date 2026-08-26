@@ -13,8 +13,8 @@ import ThreatGraphView from './ThreatGraphView';
 import { SkeletonReport } from './components/SkeletonComponents';
 import ErrorState from './ErrorState';
 import { useNavigate } from 'react-router-dom';
-
-const API_BASE = 'http://localhost:8000/api/v1';
+import { historyService } from './services/historyService';
+import { reportService } from './services/reportService';
 
 type Tab = 'overview' | 'static' | 'api' | 'ml' | 'iocs' | 'mitre' | 'graph';
 
@@ -34,21 +34,17 @@ export default function ReportView() {
         let targetSha = location.state?.sha256;
         
         if (!targetSha) {
-          const histRes = await fetch(`${API_BASE}/history?limit=1`);
-          if (histRes.ok) {
-            const histData = await histRes.json();
-            if (histData.length > 0) {
-              targetSha = histData[0].sha256;
-            }
+          const histData = await historyService.getRecentHistory(1);
+          if (histData && histData.length > 0) {
+            targetSha = histData[0].sha256;
           }
         }
 
         if (targetSha) {
-          const res = await fetch(`${API_BASE}/report/${targetSha}`);
-          if (res.ok) {
-            const data = await res.json();
+          try {
+            const data = await reportService.getReportBySha(targetSha);
             setAnalysisResult(data);
-          } else {
+          } catch (e) {
             setError("Analysis unavailable");
           }
         } else {

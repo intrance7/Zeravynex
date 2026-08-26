@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Plus, Calendar, FileText, ArrowRight, FolderSearch } from 'lucide-react';
 import EmptyState from './EmptyState';
+import { useDebounce } from './lib/hooks/useDebounce';
 
 const MOCK_INVESTIGATIONS = [
   { id: 'inv-1', title: 'Operation Nightfall', status: 'Active', updated: '2 hours ago', artifacts: 12 },
@@ -14,7 +15,12 @@ interface InvestigationsListProps {
 
 export default function InvestigationsList({ onSelect }: InvestigationsListProps) {
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300);
   const [investigations, setInvestigations] = useState(MOCK_INVESTIGATIONS);
+
+  const filteredInvestigations = investigations.filter(inv => 
+    inv.title.toLowerCase().includes(debouncedSearch.toLowerCase())
+  );
 
   return (
     <div className="p-8 max-w-7xl mx-auto w-full space-y-6">
@@ -39,7 +45,7 @@ export default function InvestigationsList({ onSelect }: InvestigationsListProps
         />
       </div>
 
-      {investigations.length === 0 ? (
+      {filteredInvestigations.length === 0 ? (
         <EmptyState 
           icon={<FolderSearch className="w-8 h-8" />}
           title="No investigations yet."
@@ -51,7 +57,7 @@ export default function InvestigationsList({ onSelect }: InvestigationsListProps
         />
       ) : (
         <div className="grid gap-4">
-          {investigations.map(inv => (
+          {filteredInvestigations.map(inv => (
             <div 
               key={inv.id} 
               className="bg-card border border-border hover:border-primary/50 p-5 rounded-xl cursor-pointer transition-all hover:shadow-md group flex items-center justify-between"

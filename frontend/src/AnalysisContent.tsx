@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const API_BASE = 'http://localhost:8000/api/v1';
+import { analysisService } from './services/analysisService';
 
 const ANALYSIS_STEPS = [
   "Preparing sample",
@@ -80,19 +80,7 @@ export default function AnalysisContent() {
     }, 1500);
 
     try {
-      const res = await fetch(`${API_BASE}/analyze`, {
-        method: 'POST',
-        body: formData,
-      });
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        clearInterval(stepInterval);
-        toast.error(`Analysis failed: ${data.detail || 'Unknown error'}`);
-        setIsUploading(false);
-        return;
-      }
+      const data = await analysisService.analyzeFile(selectedFile);
 
       if (data.status === 'completed') {
         clearInterval(stepInterval);
@@ -106,9 +94,8 @@ export default function AnalysisContent() {
         const pollInterval = setInterval(async () => {
           attempts++;
           try {
-            const taskRes = await fetch(`${API_BASE}/tasks/${data.task_id}`);
-            if (taskRes.ok) {
-              const taskData = await taskRes.json();
+            const taskData = await analysisService.getTaskStatus(data.task_id);
+            if (taskData) {
               if (taskData.status === 'completed') {
                 clearInterval(pollInterval);
                 clearInterval(stepInterval);

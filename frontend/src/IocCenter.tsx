@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from './lib/utils';
 import { CopyButton } from './CopyButton';
+import { useDebounce } from './lib/hooks/useDebounce';
 import {
   Network, Globe, MapPin, Mail, FolderCog, FileCode2, Link,
   Search, Filter, Activity, ShieldAlert, ArrowUpRight, ChevronDown, ChevronRight
@@ -26,6 +27,7 @@ import { Lock } from 'lucide-react';
 
 export default function IocCenter({ iocs }: IocCenterProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [activeFilter, setActiveFilter] = useState('all');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(IOC_TYPES.map(t => t.key)));
 
@@ -52,7 +54,7 @@ export default function IocCenter({ iocs }: IocCenterProps) {
       if (items.length === 0) return;
       if (activeFilter !== 'all' && activeFilter !== type.key) return;
 
-      const q = searchQuery.toLowerCase();
+      const q = debouncedSearchQuery.toLowerCase();
       if (!q) {
         result[type.key] = items;
       } else {
@@ -62,7 +64,7 @@ export default function IocCenter({ iocs }: IocCenterProps) {
     });
     
     return result;
-  }, [iocData, searchQuery, activeFilter]);
+  }, [iocData, debouncedSearchQuery, activeFilter]);
 
   const activeCount = Object.values(filteredData).reduce((acc, arr) => acc + arr.length, 0);
 
