@@ -177,7 +177,7 @@ export default function ReportView() {
 
       {/* Navigation Tabs & Actions */}
       <div className="flex items-end justify-between border-b border-border mb-8">
-        <div className="flex overflow-x-auto gap-2 scrollbar-none pb-[1px]">
+        <div className="flex overflow-x-auto gap-2 scrollbar-none pb-[1px]" role="tablist" aria-label="Analysis Tabs">
         {[
           { id: 'overview', label: 'Executive Overview', icon: Activity },
           { id: 'static', label: 'Static & PE Details', icon: Binary },
@@ -189,13 +189,18 @@ export default function ReportView() {
         ].map(tab => (
           <button
             key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`panel-${tab.id}`}
+            id={`tab-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             onClick={() => setActiveTab(tab.id as Tab)}
             className={cn(
-              "flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-colors relative whitespace-nowrap",
+              "flex items-center gap-2 px-5 py-3 text-sm font-semibold transition-colors relative whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-t-lg",
               activeTab === tab.id ? "text-primary" : "text-muted-foreground hover:text-foreground"
             )}
           >
-            <tab.icon className="w-4 h-4" />
+            <tab.icon className="w-4 h-4" aria-hidden="true" />
             {tab.label}
             {activeTab === tab.id && (
               <motion.div 

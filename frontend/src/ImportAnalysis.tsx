@@ -43,7 +43,7 @@ const getSeverity = (category: string) => {
 export default function ImportAnalysis({ importsExports }: ImportAnalysisProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [activeFilter, setActiveFilter] = useState<'all' | 'suspicious'>('all');
+  const [activeFilter, setActiveFilter] = useState<string>('all');
   const [expandedDlls, setExpandedDlls] = useState<Set<string>>(new Set());
   const [expandAll, setExpandAll] = useState(false);
 

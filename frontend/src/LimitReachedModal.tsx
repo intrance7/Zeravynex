@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, ArrowRight, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,19 @@ export default function LimitReachedModal({
   maxLimit = 10
 }: LimitReachedModalProps) {
   const navigate = useNavigate();
+
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      modalRef.current?.focus();
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleUpgrade = () => {
     onClose();
@@ -56,10 +70,16 @@ export default function LimitReachedModal({
             onClick={onClose}
           />
           <motion.div
+            ref={modalRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            aria-describedby="modal-description"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4"
+            className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-[101] p-4 focus:outline-none"
           >
             <div className="bg-card border border-border rounded-2xl shadow-2xl overflow-hidden relative">
               <button 
@@ -74,8 +94,8 @@ export default function LimitReachedModal({
                   <AlertTriangle className="w-6 h-6 text-warning" />
                 </div>
                 
-                <h3 className="text-xl font-bold text-foreground mb-3">{content.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                <h3 id="modal-title" className="text-xl font-bold text-foreground mb-3">{content.title}</h3>
+                <p id="modal-description" className="text-sm text-muted-foreground leading-relaxed mb-6">
                   {content.description}
                 </p>
 

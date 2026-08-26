@@ -32,19 +32,24 @@ export default function SettingsView() {
       <div className="flex flex-col lg:flex-row gap-8 items-start">
         {/* Settings Navigation */}
         <div className="w-full lg:w-64 shrink-0 bg-card border border-border rounded-xl p-3 shadow-sm sticky top-8">
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-1" role="tablist" aria-orientation="vertical" aria-label="Settings Tabs">
             {tabs.map(tab => (
               <button
                 key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={`settings-panel-${tab.id}`}
+                id={`settings-tab-${tab.id}`}
+                tabIndex={activeTab === tab.id ? 0 : -1}
                 onClick={() => setActiveTab(tab.id as any)}
                 className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all relative overflow-hidden",
+                  "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                   activeTab === tab.id 
                     ? "text-primary bg-primary/10 border border-primary/20" 
                     : "text-muted-foreground hover:bg-muted hover:text-foreground border border-transparent"
                 )}
               >
-                <tab.icon className="w-4 h-4 z-10" />
+                <tab.icon className="w-4 h-4 z-10" aria-hidden="true" />
                 <span className="z-10">{tab.label}</span>
                 {activeTab === tab.id && (
                   <motion.div 

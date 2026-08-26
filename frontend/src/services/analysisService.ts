@@ -3,6 +3,8 @@ import { apiClient } from './apiClient';
 export interface AnalysisResponse {
   task_id: string;
   status: string;
+  verdict?: string;
+  sha256?: string;
 }
 
 export interface TaskStatusResponse {
@@ -10,6 +12,7 @@ export interface TaskStatusResponse {
   status: string;
   progress: number;
   result?: any;
+  error?: string;
 }
 
 export const analysisService = {
