@@ -22,6 +22,8 @@ const CollectionsView = lazy(() => import('./CollectionsView'));
 const ReportExperience = lazy(() => import('./ReportExperience'));
 const ThreatGraphView = lazy(() => import('./ThreatGraphView'));
 const ThreatIntelView = lazy(() => import('./ThreatIntelView'));
+const ApiPortal = lazy(() => import('./ApiPortal'));
+const ApiUsage = lazy(() => import('./ApiUsage'));
 
 function SuspenseFallback() {
   return (
@@ -75,8 +77,8 @@ function App() {
             <Route path="graph" element={<ThreatGraphView />} />
             <Route path="reports" element={<ReportExperience />} />
             <Route path="collections" element={<CollectionsView />} />
-            <Route path="api" element={<ComingSoon title="API" />} />
-            <Route path="usage" element={<ComingSoon title="Usage" />} />
+            <Route path="api" element={<ApiPortal />} />
+            <Route path="usage" element={<ApiUsage />} />
             <Route path="billing" element={<Navigate to="/dashboard/settings" replace />} />
             <Route path="settings" element={<SettingsView />} />
             <Route path="pricing" element={<PricingView />} />

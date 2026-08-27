@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Key, BookOpen, Webhook, Activity, Code, Eye, EyeOff, Trash2, Plus, ArrowRight, ExternalLink } from 'lucide-react';
+import { Key, BookOpen, Webhook, Activity, Code, Trash2, Plus, ArrowRight } from 'lucide-react';
 import { CopyButton } from './CopyButton';
 
 interface ApiKey {
@@ -28,11 +28,7 @@ export default function ApiPortal() {
     }
   ]);
 
-  const [showTokens, setShowTokens] = useState<Record<string, boolean>>({});
-
-  const toggleTokenVisibility = (id: string) => {
-    setShowTokens(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  // showTokens and toggleTokenVisibility were removed as they were not used
 
   const handleRevoke = (id: string) => {
     setApiKeys(apiKeys.filter(k => k.id !== id));
