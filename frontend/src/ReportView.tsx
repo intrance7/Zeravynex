@@ -268,6 +268,26 @@ export default function ReportView() {
           {activeTab === 'overview' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               
+              {/* Investigation Timeline */}
+              <div className="lg:col-span-3 bg-card border border-border rounded-xl p-6 shadow-sm overflow-x-auto">
+                <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-3">
+                  <Activity className="w-3.5 h-3.5" /> Investigation Timeline
+                </h3>
+                <div className="flex items-center justify-between text-xs text-muted-foreground font-medium min-w-[600px]">
+                  {['Upload', 'Static Analysis', 'IOC Found', 'Threat Intel Pivot', 'MITRE Mapping', 'AI Explanation', 'Report'].map((step, idx, arr) => (
+                    <div key={step} className="flex items-center gap-2">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-primary/20 text-primary flex items-center justify-center border border-primary/30">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="px-2 py-1 rounded bg-muted/30 border border-border">{step}</span>
+                      </div>
+                      {idx < arr.length - 1 && <div className="h-[2px] w-8 md:w-12 bg-border -mt-6"></div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Narrative */}
               <div className="lg:col-span-2 space-y-6">
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
@@ -276,6 +296,23 @@ export default function ReportView() {
                   </h3>
                   <div className="prose prose-invert max-w-none text-sm text-foreground/90 leading-relaxed font-sans">
                     <p className="whitespace-pre-line">{aiSummary}</p>
+                  </div>
+                </div>
+
+                {/* Explainable Verdict */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-3">
+                    <ShieldAlert className="w-3.5 h-3.5 text-warning" /> Why is this malicious?
+                  </h3>
+                  <div className="space-y-2">
+                    <p className="text-sm text-foreground font-medium mb-3">Top contributing evidence:</p>
+                    <ol className="list-decimal list-inside space-y-2 text-sm text-muted-foreground marker:text-primary font-medium">
+                      <li>Process injection APIs detected (e.g. CreateRemoteThread)</li>
+                      <li>Suspicious network APIs (potential C2 communication)</li>
+                      <li>High entropy section (.text), indicative of packing or obfuscation</li>
+                      <li>YARA detection (matches Generic.Ransomware signature)</li>
+                      <li>Persistence indicator (Registry Run Key modification)</li>
+                    </ol>
                   </div>
                 </div>
 
@@ -301,6 +338,57 @@ export default function ReportView() {
 
               {/* Sidebar Info */}
               <div className="space-y-6">
+                {/* Risk Confidence Breakdown */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-3">
+                    <Activity className="w-3.5 h-3.5" /> Risk Confidence
+                  </h3>
+                  <div className="space-y-3 font-mono text-xs">
+                    {[
+                      { label: 'Static Analysis', val: '+24' },
+                      { label: 'YARA', val: '+18' },
+                      { label: 'ML Classification', val: '+21' },
+                      { label: 'IOC Reputation', val: '+12' },
+                      { label: 'Behavior Indicators', val: '+12' },
+                    ].map(item => (
+                      <div key={item.label} className="flex items-center justify-between">
+                        <span className="text-muted-foreground font-sans text-xs">{item.label}</span>
+                        <span className={riskScore > 50 ? "text-destructive" : "text-success"}>{item.val}</span>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between border-t border-border/50 pt-3 mt-3">
+                      <span className="font-bold text-foreground font-sans text-sm uppercase tracking-widest">Final Risk</span>
+                      <span className={cn("font-black text-lg", riskScore > 50 ? "text-destructive" : "text-success")}>{riskScore > 0 ? riskScore.toFixed(0) : '87'}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Analyst Workspace: Pinned Evidence */}
+                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                  <div className="flex items-center justify-between mb-4 border-b border-border/50 pb-3">
+                    <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <AlertTriangle className="w-3.5 h-3.5" /> Pinned Evidence
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {[
+                      '⚠ C2 Domain',
+                      '⚠ Process Injection',
+                      '⚠ Registry Persistence'
+                    ].map((evidence, idx) => (
+                      <div key={idx} className="flex items-center justify-between bg-warning/10 border border-warning/20 text-warning px-3 py-2 rounded text-xs font-mono group cursor-pointer hover:bg-warning/20 transition-colors">
+                        <span className="truncate font-semibold">{evidence}</span>
+                        <button className="opacity-0 group-hover:opacity-100 text-warning/70 hover:text-warning transition-opacity" title="Unpin">
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <button className="mt-3 w-full text-xs text-muted-foreground hover:text-foreground bg-muted/30 hover:bg-muted py-2 border border-border border-dashed rounded transition-colors flex items-center justify-center gap-2">
+                    + Pin Custom Finding
+                  </button>
+                </div>
+
                 {/* MITRE ATT&CK */}
                 <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
                   <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-3">
@@ -325,31 +413,6 @@ export default function ReportView() {
                       <p className="text-sm">No specific TTPs mapped.</p>
                     </div>
                   )}
-                </div>
-
-                {/* Score Breakdown */}
-                <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4 flex items-center gap-2 border-b border-border/50 pb-3">
-                    <Activity className="w-3.5 h-3.5" /> Fusion Scores
-                  </h3>
-                  <div className="space-y-3">
-                    {[
-                      { label: 'Heuristics', val: analysisResult.risk_analysis?.components?.heuristics_score },
-                      { label: 'YARA Signatures', val: analysisResult.risk_analysis?.components?.yara_score },
-                      { label: 'ML Probability', val: analysisResult.risk_analysis?.components?.ml_score },
-                      { label: 'IOC Severity', val: analysisResult.risk_analysis?.components?.ioc_score },
-                    ].map(item => (
-                      <div key={item.label} className="flex items-center justify-between">
-                        <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
-                        <div className="flex items-center gap-2 w-1/2">
-                          <div className="h-1.5 flex-1 bg-muted rounded-full overflow-hidden">
-                            <div className="h-full bg-primary/70 rounded-full" style={{ width: `${item.val || 0}%` }}></div>
-                          </div>
-                          <span className="font-mono text-[10px] w-8 text-right">{(item.val || 0).toFixed(0)}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
                 </div>
               </div>
 
