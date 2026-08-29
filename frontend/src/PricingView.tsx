@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 export default function PricingView() {
   const [isYearly, setIsYearly] = useState(false);
   const navigate = useNavigate();
+  const currentPlanId = 'community';
 
   return (
     <div className="min-h-[calc(100vh-64px)] overflow-y-auto bg-background text-foreground py-16 px-4 md:px-8">
@@ -83,24 +84,28 @@ export default function PricingView() {
                   <span className="text-3xl font-black text-foreground">{displayPrice}</span>
                   <span className="text-sm font-semibold text-muted-foreground mb-1">{period}</span>
                 </div>
-                {isYearly && price !== 'Custom' && price > 0 && (
+                {isYearly && price !== 'Custom' && ((tier.monthlyPriceINR as number) * 12 > (tier.yearlyPriceINR as number)) && (
                   <p className="text-[11px] font-bold text-success mt-1">₹{(tier.monthlyPriceINR as number) * 12 - (tier.yearlyPriceINR as number)} savings</p>
                 )}
-                {(!isYearly || price === 0) && price !== 'Custom' && (
+                {(!isYearly || price === 'Custom' || (price !== 'Custom' && (tier.monthlyPriceINR as number) * 12 <= (tier.yearlyPriceINR as number))) && (
                   <p className="text-[11px] font-bold text-transparent mt-1 select-none">No savings</p>
                 )}
               </div>
 
               <button 
                 onClick={() => navigate('/dashboard/settings')}
+                disabled={tier.id === currentPlanId}
                 className={cn(
                   "w-full py-2.5 rounded-lg font-bold text-sm transition-all mb-8 shadow-sm flex items-center justify-center gap-2",
-                  tier.isPopular 
-                    ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(37,99,235,0.3)]" 
-                    : "bg-muted/50 border border-border text-foreground hover:bg-muted"
+                  tier.id === currentPlanId 
+                    ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
+                    : tier.isPopular 
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(37,99,235,0.3)]" 
+                      : "bg-muted/50 border border-border text-foreground hover:bg-muted"
                 )}
               >
-                {tier.id === 'community' ? 'Get Started' : tier.id === 'team' ? 'Contact Sales' : 'Upgrade Plan'} <ArrowRight className="w-4 h-4" />
+                {tier.id === currentPlanId ? 'Current Plan' : tier.id === 'team' ? 'Contact Sales' : 'Upgrade Plan'} 
+                {tier.id !== currentPlanId && <ArrowRight className="w-4 h-4" />}
               </button>
 
               <div className="flex-1">
@@ -134,6 +139,43 @@ export default function PricingView() {
         })}
       </div>
       
+      {/* Feature Comparison */}
+      <div className="max-w-7xl mx-auto mt-24">
+        <h2 className="text-3xl font-black text-center mb-12 text-foreground">Compare Plans</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr>
+                <th className="p-4 border-b border-border/50 text-muted-foreground font-bold">Features</th>
+                {PRICING_TIERS.map(tier => (
+                  <th key={tier.id} className="p-4 border-b border-border/50 font-black text-foreground text-center">
+                    {tier.name}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { name: 'Static Analysis', values: ['Basic', 'Advanced AI', 'Advanced AI', 'Custom'] },
+                { name: 'Dynamic Sandboxing', values: ['-', 'Standard', 'Advanced', 'Custom'] },
+                { name: 'API Access', values: ['-', '100 req/day', '1000 req/day', 'Unlimited'] },
+                { name: 'History Retention', values: ['7 days', '30 days', '90 days', 'Unlimited'] },
+                { name: 'Priority Support', values: ['-', '-', 'Email', '24/7 Dedicated'] },
+              ].map((row, i) => (
+                <tr key={i} className="hover:bg-muted/20 transition-colors">
+                  <td className="p-4 border-b border-border/20 text-sm font-semibold">{row.name}</td>
+                  {row.values.map((val, j) => (
+                    <td key={j} className="p-4 border-b border-border/20 text-sm text-center text-muted-foreground">
+                      {val === '-' ? <span className="text-muted/50">-</span> : val}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* FAQ / Trust Section */}
       <div className="max-w-4xl mx-auto mt-24 text-center">
         <h2 className="text-2xl font-bold text-foreground mb-8">Enterprise Grade Security</h2>
@@ -153,6 +195,23 @@ export default function PricingView() {
             <h4 className="font-bold text-foreground mb-2">SSO Integration</h4>
             <p className="text-sm text-muted-foreground">Team tier supports Okta, Azure AD, and standard SAML 2.0 implementations.</p>
           </div>
+        </div>
+      </div>
+
+      {/* FAQ Section */}
+      <div className="max-w-4xl mx-auto mt-24 mb-16">
+        <h2 className="text-3xl font-black text-center mb-12 text-foreground">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[
+            { q: 'Can I switch plans later?', a: 'Yes, you can upgrade or downgrade your plan at any time. Prorated charges will be applied automatically.' },
+            { q: 'What happens if I exceed my analysis limits?', a: 'You will receive a notification when you are near your limit. Once reached, you can either upgrade or wait until the next billing cycle.' },
+            { q: 'Is my data secure?', a: 'Absolutely. We use enterprise-grade encryption and strict data isolation. Pro and Team tiers guarantee private analysis.' },
+          ].map((faq, i) => (
+            <div key={i} className="p-6 bg-card border border-border rounded-xl text-left">
+              <h4 className="font-bold text-foreground mb-2">{faq.q}</h4>
+              <p className="text-sm text-muted-foreground">{faq.a}</p>
+            </div>
+          ))}
         </div>
       </div>
 

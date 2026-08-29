@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 
 export default function LandingPage() {
   return (
@@ -137,6 +138,8 @@ export default function LandingPage() {
           </div>
         </motion.div>
       </main>
+
+      <Footer />
     </div>
   );
 }
