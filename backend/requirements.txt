@@ -7,7 +7,7 @@ python-multipart>=0.0.9
 # Database & ORM
 sqlalchemy>=2.0.25
 psycopg2-binary>=2.9.9
-alembic>=1.13.0
+alembic>=1.19.1
 
 # Asynchronous Task Queue & Caching
 celery>=5.3.6
