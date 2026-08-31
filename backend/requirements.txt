@@ -11,7 +11,7 @@ alembic>=1.13.0
 
 # Asynchronous Task Queue & Caching
 celery>=5.3.6
-redis>=5.0.1
+redis>=8.1.0
 
 # Object Storage
 boto3>=1.34.0
