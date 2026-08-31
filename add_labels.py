@@ -1,7 +1,7 @@
 import json
 import subprocess
 
-with open('issues.json', 'r', encoding='utf-8') as f:
+with open('issues.json', 'r', encoding='utf-16') as f:
     issues = json.load(f)
 
 for issue in issues:
@@ -25,10 +25,8 @@ for issue in issues:
         new_labels.append('documentation')
     
     if new_labels:
-        # Create labels if they don't exist (gh issue edit creates them if they don't exist? Wait, it might error if label doesn't exist, but maybe not.)
-        # Actually, gh doesn't auto-create labels using issue edit.
-        # So we might need to create labels first.
-        pass
-
-    # Print what would be done
-    print(f"Issue #{number}: {issue['title']} -> {new_labels}")
+        for label in new_labels:
+            subprocess.run(["gh", "label", "create", label], capture_output=True)
+            
+        print(f"Applying {new_labels} to Issue #{number}: {issue['title']}")
+        subprocess.run(["gh", "issue", "edit", str(number), "--add-label", ",".join(new_labels)])
