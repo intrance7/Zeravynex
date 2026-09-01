@@ -4,6 +4,7 @@ import { Check, ShieldAlert, Zap, ArrowRight, Server, Building2 } from 'lucide-r
 import { PRICING_TIERS } from './config/pricing';
 import { cn } from './lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { Button } from './components/ui/Button';
 
 export default function PricingView() {
   const [isYearly, setIsYearly] = useState(false);
@@ -87,26 +88,23 @@ export default function PricingView() {
                 {isYearly && price !== 'Custom' && ((tier.monthlyPriceINR as number) * 12 > (tier.yearlyPriceINR as number)) && (
                   <p className="text-[11px] font-bold text-success mt-1">₹{(tier.monthlyPriceINR as number) * 12 - (tier.yearlyPriceINR as number)} savings</p>
                 )}
-                {(!isYearly || price === 'Custom' || (price !== 'Custom' && (tier.monthlyPriceINR as number) * 12 <= (tier.yearlyPriceINR as number))) && (
+                {(!isYearly || price === 'Custom' || ((tier.monthlyPriceINR as number) * 12) <= (tier.yearlyPriceINR as number)) && (
                   <p className="text-[11px] font-bold text-transparent mt-1 select-none">No savings</p>
                 )}
               </div>
 
-              <button 
+              <Button 
                 onClick={() => navigate('/dashboard/settings')}
                 disabled={tier.id === currentPlanId}
+                variant={tier.id === currentPlanId ? "outline" : tier.isPopular ? "default" : "secondary"}
                 className={cn(
                   "w-full py-2.5 rounded-lg font-bold text-sm transition-all mb-8 shadow-sm flex items-center justify-center gap-2",
-                  tier.id === currentPlanId 
-                    ? "bg-muted text-muted-foreground cursor-not-allowed border border-border"
-                    : tier.isPopular 
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-[0_0_15px_rgba(37,99,235,0.3)]" 
-                      : "bg-muted/50 border border-border text-foreground hover:bg-muted"
+                  tier.isPopular && tier.id !== currentPlanId ? "shadow-[0_0_15px_rgba(37,99,235,0.3)]" : ""
                 )}
               >
                 {tier.id === currentPlanId ? 'Current Plan' : tier.id === 'team' ? 'Contact Sales' : 'Upgrade Plan'} 
                 {tier.id !== currentPlanId && <ArrowRight className="w-4 h-4" />}
-              </button>
+              </Button>
 
               <div className="flex-1">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Features Included</p>

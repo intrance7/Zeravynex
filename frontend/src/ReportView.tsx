@@ -4,6 +4,7 @@ import { ShieldAlert, CheckCircle, AlertTriangle, Activity, Database, Info, Fing
 import { cn } from './lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
+import { Button } from './components/ui/Button';
 import { CopyButton } from './CopyButton';
 import PEStaticAnalysis from './PEStaticAnalysis';
 import ImportAnalysis from './ImportAnalysis';
@@ -214,14 +215,16 @@ export default function ReportView() {
 
         {/* AI Actions */}
         <div className="relative mb-2 pr-2">
-          <button 
+          <Button 
+            variant="outline"
+            size="sm"
             onClick={() => setIsAIActionsOpen(!isAIActionsOpen)}
-            className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary border border-primary/20 rounded-md text-xs font-bold uppercase tracking-wider transition-colors"
+            className="flex items-center gap-2 bg-primary/10 hover:bg-primary/20 text-primary border-primary/20 text-xs font-bold uppercase tracking-wider transition-colors"
           >
             <BrainCircuit className="w-3.5 h-3.5" />
             AI Actions
             <ChevronDown className="w-3.5 h-3.5 ml-1" />
-          </button>
+          </Button>
 
           <AnimatePresence>
             {isAIActionsOpen && (

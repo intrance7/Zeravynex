@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, User, ArrowRight, Activity, Zap, Server, Mail, ChevronLeft, Code } from 'lucide-react';
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
 
 export default function AuthPage({ onLogin }: { onLogin: () => void }) {
   const [authState, setAuthState] = useState<'login' | 'register' | 'forgot' | 'verify'>('login');
@@ -155,27 +157,27 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Email Address</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <input 
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                        <Input 
                           type="email" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           required
-                          className="w-full bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-2.5 pl-9 pr-4 text-sm outline-none transition-all text-foreground shadow-sm font-mono"
+                          className="pl-9 font-mono"
                         />
                       </div>
                     </div>
-                    <button 
+                    <Button 
                       type="submit" 
                       disabled={isLoading}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2.5 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 mt-6 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
+                      className="w-full mt-6"
                     >
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       ) : (
                         "Send Reset Link"
                       )}
-                    </button>
+                    </Button>
                   </form>
                 </motion.div>
               )}
@@ -201,17 +203,19 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
 
                   {/* Social Logins */}
                   <div className="space-y-3 mb-6">
-                    <button 
+                    <Button 
                       type="button"
+                      variant="outline"
                       onClick={() => handleSocialLogin('github')}
-                      className="w-full flex items-center justify-center gap-3 bg-background border border-border hover:bg-muted text-foreground py-2.5 rounded-lg font-medium transition-colors text-sm"
+                      className="w-full flex items-center justify-center gap-3"
                     >
                       <Code className="w-4 h-4" /> Continue with GitHub
-                    </button>
-                    <button 
+                    </Button>
+                    <Button 
                       type="button"
+                      variant="outline"
                       onClick={() => handleSocialLogin('google')}
-                      className="w-full flex items-center justify-center gap-3 bg-background border border-border hover:bg-muted text-foreground py-2.5 rounded-lg font-medium transition-colors text-sm"
+                      className="w-full flex items-center justify-center gap-3"
                     >
                       <svg className="w-4 h-4" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -220,7 +224,7 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                       </svg>
                       Continue with Google
-                    </button>
+                    </Button>
                   </div>
 
                   <div className="relative flex items-center py-2 mb-6">
@@ -234,11 +238,11 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                       <div className="space-y-1.5">
                         <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Full Name</label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                          <input 
+                          <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                          <Input 
                             type="text" 
                             placeholder="John Doe"
-                            className="w-full bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-2.5 pl-9 pr-4 text-sm outline-none transition-all text-foreground shadow-sm font-mono"
+                            className="pl-9 font-mono"
                           />
                         </div>
                       </div>
@@ -247,14 +251,14 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">Email Address</label>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <input 
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                        <Input 
                           type="email" 
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           required
                           placeholder="analyst@soc.local"
-                          className="w-full bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-2.5 pl-9 pr-4 text-sm outline-none transition-all text-foreground shadow-sm font-mono"
+                          className="pl-9 font-mono"
                         />
                       </div>
                     </div>
@@ -273,14 +277,14 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                         )}
                       </div>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                        <input 
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                        <Input 
                           type="password" 
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
                           required
                           placeholder="••••••••••••"
-                          className="w-full bg-background border border-border focus:border-primary focus:ring-1 focus:ring-primary rounded-lg py-2.5 pl-9 pr-4 text-sm outline-none transition-all text-foreground shadow-sm font-mono"
+                          className="pl-9 font-mono"
                         />
                       </div>
                     </div>
@@ -298,19 +302,19 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
                       </div>
                     )}
 
-                    <button 
+                    <Button 
                       type="submit" 
                       disabled={isLoading}
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2.5 rounded-lg transition-all shadow-[0_0_15px_rgba(37,99,235,0.3)] flex items-center justify-center gap-2 mt-6 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
+                      className="w-full mt-6"
                     >
                       {isLoading ? (
                         <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       ) : (
                         <>
-                          {authState === 'login' ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4" />
+                          {authState === 'login' ? 'Sign In' : 'Create Account'} <ArrowRight className="w-4 h-4 ml-2" />
                         </>
                       )}
-                    </button>
+                    </Button>
                   </form>
 
                   <div className="mt-8 pt-6 border-t border-border/50 text-center">

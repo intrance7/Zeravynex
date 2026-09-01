@@ -4,6 +4,8 @@ import { cn } from './lib/utils';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from './components/ui/Button';
+import { Card } from './components/ui/Card';
 
 import { analysisService } from './services/analysisService';
 
@@ -207,12 +209,13 @@ export default function AnalysisContent() {
                   Supported extensions: <span className="font-mono bg-muted/50 px-1.5 py-0.5 rounded text-foreground text-xs border border-border">.exe</span>, <span className="font-mono bg-muted/50 px-1.5 py-0.5 rounded text-foreground text-xs border border-border">.dll</span>, <span className="font-mono bg-muted/50 px-1.5 py-0.5 rounded text-foreground text-xs border border-border">.sys</span><br/>
                   Max file size: 50MB
                 </p>
-                <button 
+                <Button 
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-secondary hover:bg-muted text-secondary-foreground px-6 py-2 rounded-md font-medium text-sm transition-colors border border-border shadow-sm"
+                  variant="secondary"
+                  className="shadow-sm"
                 >
                   Browse Files
-                </button>
+                </Button>
               </>
             ) : (
               <div className="flex flex-col items-center w-full relative z-10">
@@ -226,24 +229,25 @@ export default function AnalysisContent() {
                   {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                 </p>
                 <div className="flex gap-3">
-                  <button 
+                  <Button 
+                    variant="outline"
                     onClick={() => setSelectedFile(null)}
                     disabled={isUploading}
-                    className="bg-card hover:bg-muted text-muted-foreground px-5 py-2.5 rounded-md font-medium text-sm transition-colors border border-border disabled:opacity-50 shadow-sm"
+                    className="shadow-sm"
                   >
                     Cancel
-                  </button>
-                  <button 
+                  </Button>
+                  <Button 
                     onClick={handleSubmit}
                     disabled={isUploading}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-2.5 rounded-md font-medium text-sm transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)] flex items-center gap-2 disabled:opacity-70 disabled:shadow-none"
+                    className="shadow-[0_0_15px_rgba(37,99,235,0.4)] flex items-center gap-2"
                   >
                     {isUploading ? (
                       <><Activity className="w-4 h-4 animate-spin" /> Dissecting Payload...</>
                     ) : (
                       <>Analyze Payload</>
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
               )}
@@ -268,7 +272,7 @@ export default function AnalysisContent() {
 
         {/* Configuration Sidebar */}
         <div className="space-y-6">
-          <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+          <Card className="p-5">
             <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-5 flex items-center gap-2 border-b border-border/50 pb-3">
               <Settings className="w-3.5 h-3.5" /> Analysis Configuration
             </h3>
@@ -307,7 +311,7 @@ export default function AnalysisContent() {
                 <p className="leading-relaxed">Data is strictly isolated. Uploaded payloads are securely wiped from the ingestion server after processing completes.</p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
     </div>

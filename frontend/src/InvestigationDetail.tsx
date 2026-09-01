@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { ArrowLeft, Clock, ShieldAlert, FileText, Globe, Tag } from 'lucide-react';
+import { Button } from './components/ui/Button';
+import { Card } from './components/ui/Card';
+import { Badge } from './components/ui/Badge';
 
 interface InvestigationDetailProps {
   id: string;
@@ -22,19 +25,19 @@ export default function InvestigationDetail({ onBack }: InvestigationDetailProps
     <div className="p-8 max-w-7xl mx-auto w-full flex gap-8">
       
       <div className="flex-1 space-y-6">
-        <button onClick={onBack} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm font-medium">
+        <Button variant="ghost" onClick={onBack} className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-sm font-medium -ml-4">
           <ArrowLeft className="w-4 h-4" /> Back to Investigations
-        </button>
+        </Button>
         
         <div>
           <h1 className="text-3xl font-bold text-foreground">Operation Nightfall</h1>
           <div className="flex gap-2 mt-2">
-            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] uppercase font-bold px-2 py-0.5 rounded-full">Active</span>
-            <span className="bg-muted text-muted-foreground border border-border text-[10px] uppercase font-bold px-2 py-0.5 rounded-full flex items-center gap-1"><Tag className="w-3 h-3"/> APT29</span>
+            <Badge variant="success">Active</Badge>
+            <Badge variant="outline" className="flex items-center gap-1 bg-muted"><Tag className="w-3 h-3"/> APT29</Badge>
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-xl shadow-sm p-6">
+        <Card className="p-6">
           <h2 className="text-lg font-bold text-foreground mb-4 border-b border-border/50 pb-2">Timeline</h2>
           <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-border before:to-transparent">
             {MOCK_TIMELINE.map((item, i) => (
@@ -53,11 +56,11 @@ export default function InvestigationDetail({ onBack }: InvestigationDetailProps
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       </div>
 
       <div className="w-80 shrink-0 space-y-6">
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+        <Card className="p-5">
           <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">Quick Add Note</h3>
           <textarea 
             className="w-full bg-muted/50 border border-border/50 rounded-md p-3 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary min-h-[100px] mb-3"
@@ -65,12 +68,12 @@ export default function InvestigationDetail({ onBack }: InvestigationDetailProps
             value={note}
             onChange={e => setNote(e.target.value)}
           ></textarea>
-          <button className="w-full bg-primary text-primary-foreground py-2 rounded-md font-medium text-sm hover:bg-primary/90 transition-colors">
+          <Button className="w-full">
             Add to Timeline
-          </button>
-        </div>
+          </Button>
+        </Card>
 
-        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+        <Card className="p-5">
           <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-4">Linked Artifacts</h3>
           <ul className="space-y-3">
             <li className="flex items-center gap-3 text-sm">
@@ -95,7 +98,7 @@ export default function InvestigationDetail({ onBack }: InvestigationDetailProps
               </div>
             </li>
           </ul>
-        </div>
+        </Card>
       </div>
 
     </div>

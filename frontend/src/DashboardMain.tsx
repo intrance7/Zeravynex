@@ -2,6 +2,9 @@ import { ShieldAlert, Activity, Database, Search, FileCode2, Network, Shield, He
 import { Link } from 'react-router-dom';
 import { cn } from './lib/utils';
 import { motion } from 'framer-motion';
+import { Button } from './components/ui/Button';
+import { Card } from './components/ui/Card';
+import { Badge } from './components/ui/Badge';
 
 export default function DashboardMain() {
   return (
@@ -16,15 +19,17 @@ export default function DashboardMain() {
           <p className="text-muted-foreground mt-1">Analyst workspace and global threat telemetry.</p>
         </div>
         <div className="flex gap-3">
-          <Link to="/dashboard/analyze" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
-            <Hexagon className="w-4 h-4" /> Analyze File
+          <Link to="/dashboard/analyze">
+            <Button className="flex items-center gap-2 shadow-sm font-medium">
+              <Hexagon className="w-4 h-4" /> Analyze File
+            </Button>
           </Link>
-          <button className="bg-card hover:bg-muted text-foreground border border-border px-4 py-2 rounded-md font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
+          <Button variant="outline" className="flex items-center gap-2 shadow-sm font-medium">
             <Search className="w-4 h-4" /> Search IOC
-          </button>
-          <button className="bg-card hover:bg-muted text-foreground border border-border px-4 py-2 rounded-md font-medium text-sm transition-colors shadow-sm flex items-center gap-2">
+          </Button>
+          <Button variant="outline" className="flex items-center gap-2 shadow-sm font-medium">
             <Plus className="w-4 h-4" /> New Investigation
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -42,14 +47,15 @@ export default function DashboardMain() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
-            className="bg-card border border-border rounded-xl p-5 shadow-sm"
           >
-            <div className="flex justify-between items-start mb-2">
-              <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{kpi.label}</p>
-              <kpi.icon className={cn("w-4 h-4", kpi.color)} />
-            </div>
-            <h3 className="text-2xl font-black text-foreground">{kpi.value}</h3>
-            <p className="text-xs text-muted-foreground mt-1">{kpi.desc}</p>
+            <Card className="p-5">
+              <div className="flex justify-between items-start mb-2">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{kpi.label}</p>
+                <kpi.icon className={cn("w-4 h-4", kpi.color)} />
+              </div>
+              <h3 className="text-2xl font-black text-foreground">{kpi.value}</h3>
+              <p className="text-xs text-muted-foreground mt-1">{kpi.desc}</p>
+            </Card>
           </motion.div>
         ))}
       </div>
@@ -64,7 +70,7 @@ export default function DashboardMain() {
             </h2>
             <Link to="/dashboard/investigations" className="text-xs font-semibold text-primary hover:underline">View All</Link>
           </div>
-          <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+          <Card className="overflow-hidden">
             <table className="w-full text-sm text-left">
               <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30 border-b border-border">
                 <tr>
@@ -88,9 +94,9 @@ export default function DashboardMain() {
                       <div className="font-mono text-xs font-semibold text-foreground group-hover:text-primary transition-colors">{row.name}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider", row.color, row.bg, "border", row.color.replace('text-', 'border-').replace('500', '500/30'))}>
+                      <Badge variant={row.verdict === 'CRITICAL' || row.verdict === 'MALICIOUS' ? 'destructive' : row.verdict === 'SUSPICIOUS' ? 'warning' : 'success'}>
                         {row.verdict}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -106,7 +112,7 @@ export default function DashboardMain() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         </div>
 
         {/* Threat Activity (Takes up 1 column) */}
@@ -119,7 +125,7 @@ export default function DashboardMain() {
           
           <div className="space-y-4">
             {/* Top MITRE Techniques */}
-            <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+            <Card className="p-5">
               <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Top MITRE Techniques</h3>
               <div className="space-y-3">
                 {[
@@ -138,10 +144,10 @@ export default function DashboardMain() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
 
             {/* Severity Distribution */}
-            <div className="bg-card border border-border rounded-xl p-5 shadow-sm flex items-center justify-center min-h-[180px]">
+            <Card className="p-5 flex items-center justify-center min-h-[180px]">
                <div className="text-center">
                  <div className="flex items-center justify-center gap-1 h-24 items-end mb-4 border-b border-border/50 pb-2">
                     <div className="w-8 bg-success/80 rounded-t-sm h-[74%]" title="Benign"></div>
@@ -150,7 +156,7 @@ export default function DashboardMain() {
                  </div>
                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Severity Distribution</p>
                </div>
-            </div>
+            </Card>
           </div>
         </div>
 

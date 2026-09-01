@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Search, Plus, Calendar, FileText, ArrowRight, FolderSearch } from 'lucide-react';
 import EmptyState from './EmptyState';
 import { useDebounce } from './lib/hooks/useDebounce';
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
 
 const MOCK_INVESTIGATIONS = [
   { id: 'inv-1', title: 'Operation Nightfall', status: 'Active', updated: '2 hours ago', artifacts: 12 },
@@ -29,17 +31,17 @@ export default function InvestigationsList({ onSelect }: InvestigationsListProps
           <h1 className="text-3xl font-bold text-foreground">Investigations Workspace</h1>
           <p className="text-muted-foreground mt-1">Track and manage active security operations.</p>
         </div>
-        <button className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md hover:bg-primary/90 transition-colors font-medium">
+        <Button className="flex items-center gap-2 font-medium">
           <Plus className="w-4 h-4" /> New Investigation
-        </button>
+        </Button>
       </div>
 
       <div className="relative">
         <Search className="absolute left-3 top-3 w-5 h-5 text-muted-foreground" />
-        <input 
+        <Input 
           type="text" 
           placeholder="Search investigations..." 
-          className="w-full bg-card border border-border rounded-lg py-2.5 pl-10 pr-4 text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
+          className="pl-10"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Shield } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Footer from './components/Footer';
+import { Button } from './components/ui/Button';
 
 export default function LandingPage() {
   return (
@@ -16,11 +17,11 @@ export default function LandingPage() {
           <span className="text-xl font-bold tracking-tight text-foreground">Zeravynex</span>
         </div>
         <div className="flex gap-4">
-          <Link to="/login" className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            Log in
+          <Link to="/login">
+            <Button variant="ghost" className="text-muted-foreground">Log in</Button>
           </Link>
-          <Link to="/dashboard" className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
-            Explore Platform
+          <Link to="/dashboard">
+            <Button>Explore Platform</Button>
           </Link>
         </div>
       </nav>
@@ -41,11 +42,15 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-24">
-            <Link to="/login" className="px-8 py-4 text-base font-semibold bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)]">
-              Analyze a Sample <ArrowRight className="w-5 h-5" />
+            <Link to="/login">
+              <Button size="lg" className="px-8 py-6 text-lg font-semibold flex items-center gap-2">
+                Analyze a Sample <ArrowRight className="w-5 h-5" />
+              </Button>
             </Link>
-            <Link to="/dashboard" className="px-8 py-4 text-base font-semibold border border-border text-foreground rounded-lg hover:bg-muted transition-colors">
-              Explore Platform
+            <Link to="/dashboard">
+              <Button variant="outline" size="lg" className="px-8 py-6 text-lg font-semibold">
+                Explore Platform
+              </Button>
             </Link>
           </div>
         </motion.div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Key, BookOpen, Webhook, Activity, Code, Trash2, Plus, ArrowRight } from 'lucide-react';
 import { CopyButton } from './CopyButton';
 

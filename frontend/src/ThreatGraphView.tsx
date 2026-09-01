@@ -2,6 +2,9 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import { Maximize2, ZoomIn, ZoomOut, Search } from 'lucide-react';
 import { useDebounce } from './lib/hooks/useDebounce';
+import { Button } from './components/ui/Button';
+import { Input } from './components/ui/Input';
+import { Card } from './components/ui/Card';
 
 interface ThreatGraphViewProps {
   data?: any;
@@ -134,19 +137,19 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
 
   return (
     <div className="relative w-full h-[700px] bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
-      <div className="absolute top-4 left-4 z-10 bg-background/80 backdrop-blur-md p-3 rounded-lg border border-border/50 shadow-lg w-64">
+      <Card className="absolute top-4 left-4 z-10 w-64 bg-background/80 backdrop-blur-md p-4 shadow-lg border-border/50">
         <h3 className="text-sm font-bold text-foreground mb-3 flex items-center gap-2">
-           Threat Graph Overview
+            Threat Intelligence
         </h3>
-        <div className="relative mb-3">
-          <Search className="absolute left-2.5 top-1.5 w-4 h-4 text-muted-foreground" />
-          <input 
-            type="text" 
-            placeholder="Search nodes..." 
-            className="w-full bg-muted/50 border border-border/50 rounded-md py-1.5 pl-8 pr-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+        <div className="relative mb-4">
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+            <Input 
+                type="text"
+                placeholder="Find node..."
+                className="pl-8 bg-background/50 h-9 text-xs"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
         </div>
         
         {hoverNode && (
@@ -159,18 +162,18 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
                 </div>
             </div>
         )}
-      </div>
+      </Card>
 
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-        <button onClick={handleZoomIn} className="p-2 bg-background/80 backdrop-blur-md border border-border/50 hover:bg-muted/80 rounded-md text-foreground transition-colors" title="Zoom In">
+        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom In">
           <ZoomIn className="w-4 h-4" />
-        </button>
-        <button onClick={handleZoomOut} className="p-2 bg-background/80 backdrop-blur-md border border-border/50 hover:bg-muted/80 rounded-md text-foreground transition-colors" title="Zoom Out">
+        </Button>
+        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom Out">
           <ZoomOut className="w-4 h-4" />
-        </button>
-        <button onClick={handleFit} className="p-2 bg-background/80 backdrop-blur-md border border-border/50 hover:bg-muted/80 rounded-md text-foreground transition-colors" title="Fit to Screen">
+        </Button>
+        <Button variant="outline" size="icon" onClick={handleFit} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Fit to Screen">
           <Maximize2 className="w-4 h-4" />
-        </button>
+        </Button>
       </div>
 
       <div className="flex-1 bg-[#0d1117]" ref={containerRef}>
