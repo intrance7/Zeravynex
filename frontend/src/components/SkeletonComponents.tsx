@@ -128,3 +128,33 @@ export function SkeletonReport() {
     </div>
   );
 }
+
+export function SkeletonSettings() {
+  return (
+    <div className="w-full max-w-4xl mx-auto space-y-8 animate-pulse">
+      {/* Header */}
+      <div className="space-y-3 mb-8 border-b border-border/50 pb-6">
+        <div className="h-8 bg-muted/50 rounded w-1/4"></div>
+        <div className="h-4 bg-muted/50 rounded w-1/2"></div>
+      </div>
+
+      {/* Settings Sections */}
+      {Array.from({ length: 3 }).map((_, idx) => (
+        <div key={idx} className="bg-card border border-border rounded-xl p-6">
+          <div className="h-5 bg-muted/50 rounded w-1/5 mb-6"></div>
+          <div className="space-y-6">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="flex justify-between items-center pb-4 border-b border-border/30 last:border-0 last:pb-0">
+                <div className="space-y-2 w-1/2">
+                  <div className="h-4 bg-muted/50 rounded w-1/3"></div>
+                  <div className="h-3 bg-muted/50 rounded w-3/4"></div>
+                </div>
+                <div className="h-10 bg-muted/50 rounded w-24"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
