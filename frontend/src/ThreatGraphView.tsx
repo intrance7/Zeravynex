@@ -142,10 +142,11 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
             Threat Intelligence
         </h3>
         <div className="relative mb-4">
-            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" aria-hidden="true" />
             <Input 
                 type="text"
                 placeholder="Find node..."
+                aria-label="Search threat graph nodes"
                 className="pl-8 bg-background/50 h-9 text-xs"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -165,14 +166,14 @@ export default function ThreatGraphView({ data }: ThreatGraphViewProps) {
       </Card>
 
       <div className="absolute top-4 right-4 z-10 flex flex-col gap-2">
-        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom In">
-          <ZoomIn className="w-4 h-4" />
+        <Button variant="outline" size="icon" onClick={handleZoomIn} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom In" aria-label="Zoom In">
+          <ZoomIn className="w-4 h-4" aria-hidden="true" />
         </Button>
-        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom Out">
-          <ZoomOut className="w-4 h-4" />
+        <Button variant="outline" size="icon" onClick={handleZoomOut} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Zoom Out" aria-label="Zoom Out">
+          <ZoomOut className="w-4 h-4" aria-hidden="true" />
         </Button>
-        <Button variant="outline" size="icon" onClick={handleFit} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Fit to Screen">
-          <Maximize2 className="w-4 h-4" />
+        <Button variant="outline" size="icon" onClick={handleFit} className="bg-background/80 backdrop-blur-md border-border/50 hover:bg-muted/80 shadow-sm" title="Fit to Screen" aria-label="Fit to Screen">
+          <Maximize2 className="w-4 h-4" aria-hidden="true" />
         </Button>
       </div>
 
