@@ -3,6 +3,7 @@ import { CreditCard, Download, CheckCircle2, AlertCircle, RefreshCw, XCircle, Pa
 import { PRICING_TIERS, SUBSCRIPTION_STATES, type SubscriptionState } from './config/pricing';
 import { useNavigate } from 'react-router-dom';
 import { RazorpayProvider } from './lib/payments';
+import { Button } from './components/ui/Button';
 
 export default function BillingSettings() {
   const navigate = useNavigate();
@@ -143,18 +144,19 @@ export default function BillingSettings() {
           </div>
           
           <div className="flex items-center gap-3 relative z-10">
-            <button 
-              onClick={handleCheckout}
-              className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2.5 rounded-lg transition-colors text-sm shadow-sm"
+            <Button 
+              onClick={() => navigate('/dashboard/pricing')}
+              className="flex-1 font-semibold py-2.5"
             >
               Upgrade Plan
-            </button>
-            <button 
+            </Button>
+            <Button 
+              variant="outline"
               onClick={() => window.dispatchEvent(new CustomEvent('simulate-limit'))}
-              className="flex-1 bg-muted/50 border border-border hover:bg-muted text-foreground font-semibold py-2.5 rounded-lg transition-colors text-sm"
+              className="flex-1 font-semibold py-2.5"
             >
               Simulate Limit
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -256,33 +258,35 @@ export default function BillingSettings() {
           <div className="flex flex-wrap items-center gap-4">
             {subState === 'Active' || subState === 'Trial' ? (
               <>
-                <button 
+                <Button 
+                  variant="secondary"
                   onClick={() => setSubState('Paused')}
-                  className="flex items-center gap-2 px-4 py-2 bg-muted hover:bg-muted/80 text-foreground font-semibold rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 font-semibold"
                 >
                   <PauseCircle className="w-4 h-4" /> Pause Subscription
-                </button>
-                <button 
+                </Button>
+                <Button 
+                  variant="destructive"
                   onClick={() => setSubState('Canceled')}
-                  className="flex items-center gap-2 px-4 py-2 border border-destructive/20 text-destructive hover:bg-destructive/10 font-semibold rounded-lg transition-colors text-sm"
+                  className="flex items-center gap-2 px-4 py-2 font-semibold bg-transparent hover:bg-destructive/10 text-destructive border border-destructive/20"
                 >
                   <XCircle className="w-4 h-4" /> Cancel Subscription
-                </button>
+                </Button>
               </>
             ) : subState === 'Paused' ? (
-              <button 
+              <Button 
                 onClick={() => setSubState('Active')}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-colors text-sm"
+                className="flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <PlayCircle className="w-4 h-4" /> Resume Subscription
-              </button>
+              </Button>
             ) : (
-              <button 
+              <Button 
                 onClick={() => navigate('/dashboard/pricing')}
-                className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-colors text-sm"
+                className="flex items-center gap-2 px-4 py-2 font-semibold"
               >
                 <RefreshCw className="w-4 h-4" /> Reactivate Plan
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -294,13 +298,15 @@ export default function BillingSettings() {
           <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Dev Tools: Test States</p>
           <div className="flex flex-wrap gap-2">
             {SUBSCRIPTION_STATES.map(state => (
-              <button 
+              <Button 
                 key={state} 
                 onClick={() => setSubState(state)}
-                className={`px-3 py-1 text-xs font-semibold rounded-md border ${subState === state ? 'bg-primary text-primary-foreground border-primary' : 'bg-transparent text-muted-foreground border-border hover:bg-muted'}`}
+                variant={subState === state ? "default" : "outline"}
+                size="sm"
+                className="px-3 py-1 text-xs font-semibold"
               >
                 {state}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
