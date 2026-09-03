@@ -108,7 +108,7 @@ app.include_router(api_router, prefix="/api/v1")
 
 
 @app.get("/", tags=["System"])
-def read_root():
+def read_root() -> dict:
     """Root endpoint returning service identity and status."""
     return {
         "service": settings.APP_NAME,
