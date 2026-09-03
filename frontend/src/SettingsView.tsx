@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, ShieldAlert, CreditCard, Users, Terminal, Settings } from 'lucide-react';
+import { User, ShieldAlert, CreditCard, Users, Terminal, Settings, GitBranch } from 'lucide-react';
 import { cn } from './lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import ProfileSettings from './ProfileSettings';
@@ -7,7 +7,7 @@ import SecuritySettings from './SecuritySettings';
 import BillingSettings from './BillingSettings';
 
 export default function SettingsView() {
-  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing' | 'team' | 'api'>('profile');
+  const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'billing' | 'team' | 'api' | 'vcs'>('profile');
 
   const tabs = [
     { id: 'profile', label: 'User Profile', icon: User },
@@ -15,6 +15,7 @@ export default function SettingsView() {
     { id: 'billing', label: 'Billing & Usage', icon: CreditCard },
     { id: 'team', label: 'Team Members', icon: Users },
     { id: 'api', label: 'API Keys', icon: Terminal },
+    { id: 'vcs', label: 'Version Control', icon: GitBranch },
   ];
 
   return (
@@ -88,6 +89,13 @@ export default function SettingsView() {
                   <Terminal className="w-12 h-12 mx-auto mb-4 opacity-20" />
                   <h3 className="text-lg font-bold text-foreground">API Developer Portal</h3>
                   <p className="text-sm mt-2">Manage programmatic access tokens and webhooks.</p>
+                </div>
+              )}
+              {activeTab === 'vcs' && (
+                <div className="text-center py-20 text-muted-foreground">
+                  <GitBranch className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                  <h3 className="text-lg font-bold text-foreground">Version Control System</h3>
+                  <p className="text-sm mt-2">Connect to GitHub, GitLab, or Bitbucket to sync analysis workflows.</p>
                 </div>
               )}
             </motion.div>
