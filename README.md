@@ -29,6 +29,7 @@
 
 Unlike traditional black-box detection tools, Zeravynex provides **transparent, explainable security decisions** by fusing deterministic heuristics, YARA signatures, machine learning models, and **SHAP (SHapley Additive exPlanations)** to explain *why* a binary was classified as malicious.
 
+
 > ⚠️ **Safety Notice**: Zeravynex performs **Static Analysis ONLY**. Uploaded binaries are never dynamically executed on the host.
 
 ---
