@@ -116,3 +116,4 @@ def read_root() -> dict:
         "status": "online",
         "environment": settings.APP_ENV,
     }
+
