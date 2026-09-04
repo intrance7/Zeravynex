@@ -8,6 +8,7 @@ export default {
     extend: {
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        outfit: ['Outfit', 'sans-serif'],
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
@@ -60,17 +61,26 @@ export default {
       },
       boxShadow: {
         'glow-primary': '0 0 20px -5px hsl(var(--primary) / 0.4)',
+        'glow-accent': '0 0 20px -5px hsl(var(--accent) / 0.4)',
         'glow-destructive': '0 0 20px -5px hsl(var(--destructive) / 0.4)',
+        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
       },
       animation: {
         "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "float": "float 3s ease-in-out infinite",
-        "spin-slow": "spin 3s linear infinite",
+        "spin-slow": "spin 8s linear infinite",
+        "blob": "blob 7s infinite",
       },
       keyframes: {
         float: {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-5px)" },
+        },
+        blob: {
+          "0%": { transform: "translate(0px, 0px) scale(1)" },
+          "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+          "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+          "100%": { transform: "translate(0px, 0px) scale(1)" },
         }
       }
     },

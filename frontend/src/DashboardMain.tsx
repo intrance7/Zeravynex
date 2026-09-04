@@ -48,7 +48,7 @@ export default function DashboardMain() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.1 }}
           >
-            <Card className="p-5">
+            <Card className="p-5 glass-panel glass-panel-hover">
               <div className="flex justify-between items-start mb-2">
                 <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">{kpi.label}</p>
                 <kpi.icon className={cn("w-4 h-4", kpi.color)} />
@@ -70,7 +70,7 @@ export default function DashboardMain() {
             </h2>
             <Link to="/dashboard/investigations" className="text-xs font-semibold text-primary hover:underline">View All</Link>
           </div>
-          <Card className="overflow-hidden">
+          <Card className="overflow-hidden glass-panel">
             <table className="w-full text-sm text-left">
               <thead className="text-[10px] uppercase tracking-wider text-muted-foreground bg-muted/30 border-b border-border">
                 <tr>
@@ -125,7 +125,7 @@ export default function DashboardMain() {
           
           <div className="space-y-4">
             {/* Top MITRE Techniques */}
-            <Card className="p-5">
+            <Card className="p-5 glass-panel">
               <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-4">Top MITRE Techniques</h3>
               <div className="space-y-3">
                 {[
@@ -147,7 +147,7 @@ export default function DashboardMain() {
             </Card>
 
             {/* Severity Distribution */}
-            <Card className="p-5 flex items-center justify-center min-h-[180px]">
+            <Card className="p-5 flex items-center justify-center min-h-[180px] glass-panel">
                <div className="text-center">
                  <div className="flex items-center justify-center gap-1 h-24 items-end mb-4 border-b border-border/50 pb-2">
                     <div className="w-8 bg-success/80 rounded-t-sm h-[74%]" title="Benign"></div>

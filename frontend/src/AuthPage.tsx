@@ -40,8 +40,8 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-[10%] left-[10%] w-[40rem] h-[40rem] bg-primary/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[5%] right-[5%] w-[35rem] h-[35rem] bg-blue-500/5 rounded-full blur-[120px]" />
+        <div className="absolute top-[10%] left-[10%] w-[40rem] h-[40rem] bg-primary/20 rounded-full blur-[120px] animate-blob" />
+        <div className="absolute bottom-[5%] right-[5%] w-[35rem] h-[35rem] bg-accent/20 rounded-full blur-[120px] animate-blob animation-delay-2000" />
       </div>
 
       <div className="w-full max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 p-6 relative z-10 items-center h-full min-h-screen">
@@ -105,8 +105,8 @@ export default function AuthPage({ onLogin }: { onLogin: () => void }) {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md mx-auto relative"
         >
-          <div className="bg-card border border-border p-8 rounded-2xl shadow-2xl relative overflow-hidden backdrop-blur-xl">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-blue-500 to-cyan-400 opacity-50"></div>
+          <div className="glass-panel p-8 rounded-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-accent to-primary opacity-50"></div>
             
             <AnimatePresence mode="wait">
               {/* === VERIFY EMAIL STATE === */}

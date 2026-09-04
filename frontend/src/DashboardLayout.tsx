@@ -77,7 +77,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
   ];
 
   return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans">
+    <div className="flex h-screen bg-transparent text-foreground overflow-hidden font-sans">
       
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
@@ -89,7 +89,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
 
       {/* Sidebar - Compact & Utilitarian */}
       <aside className={cn(
-        "w-64 bg-card border-r border-border flex flex-col justify-between z-40 shrink-0 shadow-[4px_0_24px_-10px_rgba(0,0,0,0.5)] transition-transform duration-300 absolute lg:relative h-full",
+        "w-64 bg-card/60 backdrop-blur-xl border-r border-white/5 flex flex-col justify-between z-40 shrink-0 shadow-glass transition-transform duration-300 absolute lg:relative h-full",
         isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         
@@ -145,10 +145,10 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col relative overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col relative overflow-hidden bg-transparent">
         
         {/* Top Header */}
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4 lg:px-6 z-20 shrink-0">
+        <header className="h-16 border-b border-white/5 bg-card/40 backdrop-blur-lg flex items-center justify-between px-4 lg:px-6 z-20 shrink-0 shadow-sm">
           
           <div className="flex items-center gap-2 lg:hidden mr-2">
             <button 
@@ -235,7 +235,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
         </header>
 
         {/* Content Outlet */}
-        <main className="flex-1 overflow-y-auto bg-background scroll-smooth">
+        <main className="flex-1 overflow-y-auto bg-transparent scroll-smooth">
           {/* Usage Limit Banner (80% approaching) */}
           <AnimatePresence>
             {showUsageBanner && (

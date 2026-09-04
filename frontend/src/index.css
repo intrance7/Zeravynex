@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,46 +6,46 @@
 
 @layer base {
   :root {
-    /* Backgrounds: Deep Space/Slate */
-    --background: 222 47% 4%; 
-    --foreground: 210 40% 98%;
+    /* Backgrounds: Ultra-dark deep violet/blue space */
+    --background: 230 45% 2%; 
+    --foreground: 220 40% 98%;
 
-    --card: 222 47% 5.5%;
-    --card-foreground: 210 40% 98%;
+    --card: 230 45% 4%;
+    --card-foreground: 220 40% 98%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 215 20.2% 65.1%;
+    --popover: 230 50% 3%;
+    --popover-foreground: 215 20% 75%;
 
-    /* Brand primary: Cyber Blue */
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Brand primary: Vibrant Cyan/Teal glow */
+    --primary: 190 90% 50%;
+    --primary-foreground: 230 45% 2%;
 
     /* Secondary backgrounds */
-    --secondary: 217.2 32.6% 12.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 230 40% 12%;
+    --secondary-foreground: 220 40% 98%;
 
     /* Muted elements */
-    --muted: 217.2 32.6% 11.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 230 40% 10%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 12.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 270 80% 60%; /* A sleek purple accent for variety */
+    --accent-foreground: 220 40% 98%;
 
     /* Semantic Severities */
-    --destructive: 0 84.2% 60.2%; /* Critical Red */
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 350 85% 60%; /* Neon Red */
+    --destructive-foreground: 220 40% 98%;
     
-    --warning: 38 92% 50%; /* Amber High/Suspicious */
-    --warning-foreground: 210 40% 98%;
+    --warning: 40 95% 55%; /* Cyber Amber */
+    --warning-foreground: 230 45% 2%;
     
-    --success: 142 71% 45%; /* Emerald Clean */
-    --success-foreground: 210 40% 98%;
+    --success: 150 75% 45%; /* Matrix Green */
+    --success-foreground: 230 45% 2%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --border: 230 40% 15%;
+    --input: 230 40% 12%;
+    --ring: 190 90% 50%;
 
-    --radius: 0.35rem;
+    --radius: 0.75rem;
   }
 }
 
@@ -56,15 +56,30 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
-    /* Subtle grid background for tech feel */
-    background-image: 
-      linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
-    background-size: 40px 40px;
+    /* A rich, premium dark gradient */
+    background: radial-gradient(circle at top center, hsl(230, 40%, 8%), hsl(230, 45%, 2%) 70%);
     background-attachment: fixed;
+    min-height: 100vh;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold tracking-tight;
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+/* Glassmorphism utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-card/60 backdrop-blur-xl border border-white/5 shadow-xl;
+  }
+  .glass-panel-hover {
+    @apply hover:bg-card/80 hover:border-white/10 transition-all duration-300;
+  }
+  .text-glow {
+    text-shadow: 0 0 15px hsl(var(--primary) / 0.5);
+  }
+  .text-glow-accent {
+    text-shadow: 0 0 15px hsl(var(--accent) / 0.5);
   }
 }
 
@@ -74,29 +89,17 @@
   outline-offset: 2px;
 }
 
-/* Accessibility: Reduced Motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
 /* Custom Scrollbar for Webkit */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted-foreground/20 rounded-full border-[2px] border-transparent bg-clip-padding;
+  @apply bg-muted-foreground/30 rounded-full;
 }
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground/40;
+  @apply bg-muted-foreground/50;
 }
