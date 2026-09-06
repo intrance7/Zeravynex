@@ -1,39 +1,72 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Lock, User, ArrowRight, Activity, Zap, Server, Mail, ChevronLeft, Code } from 'lucide-react';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
+import { useAuthStore } from './store/authStore';
+import { apiClient } from './services/apiClient';
 
-export default function AuthPage({ onLogin }: { onLogin: () => void }) {
+export default function AuthPage() {
   const [authState, setAuthState] = useState<'login' | 'register' | 'forgot' | 'verify'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const { login } = useAuthStore();
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    
+    if (token) {
+      setIsLoading(true);
+      // Temporarily set token in store so apiClient can use it
+      useAuthStore.getState().setToken(token);
+      
+      // Fetch user profile
+      apiClient.get<any>('/auth/me')
+        .then(user => {
+           login(token, user);
+        })
+        .catch(err => {
+           console.error("Failed to fetch user profile", err);
+           useAuthStore.getState().logout();
+        })
+        .finally(() => {
+           setIsLoading(false);
+           // Clear token from URL
+           window.history.replaceState({}, document.title, window.location.pathname);
+        });
+    }
+  }, [login]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate authentication process
+    // Fallback simple auth mock for email/password (or implement actual backend flow)
     setTimeout(() => {
       setIsLoading(false);
       if (authState === 'register') {
         setAuthState('verify');
       } else if (authState === 'forgot') {
         setAuthState('login');
-        // Show toast in real app
       } else {
-        onLogin();
+        login("mock-token", { id: '1', name: 'Admin', email, role: 'admin' });
       }
     }, 1500);
   };
 
-  const handleSocialLogin = (_provider: string) => {
+  const handleSocialLogin = (provider: string) => {
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin();
-    }, 1500);
+    if (provider === 'google') {
+      window.location.href = 'http://localhost:8000/api/v1/auth/google/login';
+    } else {
+      setTimeout(() => {
+        setIsLoading(false);
+        // Fallback for other providers
+      }, 1500);
+    }
   };
 
   return (

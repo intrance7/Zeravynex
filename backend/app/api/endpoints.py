@@ -141,11 +141,16 @@ def get_task_status(task_id: str):
     except Exception as e:
         return {"status": "completed", "task_id": task_id}
 
+from app.core.auth import get_current_user
+from app.models.user import User
+
 @router.get("/history")
-def get_analysis_history(skip: int = 0, limit: int = 50, db: Session = Depends(get_db)):
-    """
-    Retrieve past analysis records.
-    """
+def get_analysis_history(
+    skip: int = 0, 
+    limit: int = 50, 
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     results = db.query(AnalysisResult).order_by(AnalysisResult.created_at.desc()).offset(skip).limit(limit).all()
     return [{
         "id": r.id,

@@ -33,7 +33,14 @@ def override_get_db():
     finally:
         db.close()
 
+from app.core.auth import get_current_user
+from app.models.user import User
+
+def override_get_current_user():
+    return User(id=1, email="test@test.com", name="Test User", role="admin")
+
 app.dependency_overrides[get_db] = override_get_db
+app.dependency_overrides[get_current_user] = override_get_current_user
 client = TestClient(app)
 
 def test_read_root():

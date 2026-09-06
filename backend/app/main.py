@@ -19,6 +19,8 @@ from app.core.middleware import (
     FileSizeLimitMiddleware,
 )
 from app.api.endpoints import router as api_router
+from app.api.auth import router as auth_router
+from starlette.middleware.sessions import SessionMiddleware
 
 settings = get_settings()
 logger = setup_logging(level=settings.LOG_LEVEL, env=settings.APP_ENV)
@@ -73,6 +75,9 @@ app.add_middleware(RequestIDMiddleware)
 # 2. Security Headers (OWASP)
 app.add_middleware(SecurityHeadersMiddleware)
 
+# 2.5 Session Middleware (required by authlib for OAuth flow)
+app.add_middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)
+
 # 3. Rate Limiting on upload endpoint
 app.add_middleware(
     RateLimitMiddleware,
@@ -106,6 +111,7 @@ else:
 # ── Routes ───────────────────────────────────────────────────────────────────
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")
 
 
 @app.get("/", tags=["System"])

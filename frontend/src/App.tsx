@@ -44,14 +44,13 @@ function App() {
           {/* Landing Page */}
           <Route path="/" element={<LandingPage />} />
 
-          {/* Auth Route */}
           <Route 
             path="/login" 
             element={
               isAuthenticated ? (
                 <Navigate to="/dashboard" replace />
               ) : (
-                <AuthPage onLogin={() => login({ id: '1', name: 'Admin', email: 'admin@zeravynex.com', role: 'admin' })} />
+                <AuthPage />
               )
             } 
           />
