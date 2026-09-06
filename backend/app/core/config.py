@@ -58,6 +58,15 @@ class Settings:
     # === Rate Limiting ===
     RATE_LIMIT_UPLOADS_PER_MIN: int = int(os.environ.get("RATE_LIMIT_UPLOADS_PER_MIN", "10"))
 
+    # === Authentication ===
+    GOOGLE_CLIENT_ID: Optional[str] = os.environ.get("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: Optional[str] = os.environ.get("GOOGLE_CLIENT_SECRET")
+    JWT_SECRET: str = os.environ.get("JWT_SECRET", "super-secret-default-key-do-not-use-in-prod")
+    JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
+    JWT_EXPIRE_MINUTES: int = int(os.environ.get("JWT_EXPIRE_MINUTES", "1440"))
+    OAUTH_REDIRECT_URI: str = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:8000/api/v1/auth/google/callback")
+    FRONTEND_URL: str = os.environ.get("FRONTEND_URL", "http://localhost:5173")
+
     # === Analysis Engines ===
     YARA_RULES_DIR: str = os.environ.get("YARA_RULES_DIR", str(Path(__file__).resolve().parent.parent.parent / "yara_rules"))
     ML_MODEL_PATH: str = os.environ.get("ML_MODEL_PATH", str(Path(__file__).resolve().parent.parent.parent / "ml" / "models" / "rf_malware_model.joblib"))

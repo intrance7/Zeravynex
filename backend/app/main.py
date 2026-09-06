@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.core.database import engine, Base
+import app.models  # ensure models are registered
 from app.core.middleware import (
     RequestIDMiddleware,
     SecurityHeadersMiddleware,
