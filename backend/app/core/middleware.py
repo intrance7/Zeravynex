@@ -48,10 +48,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 
+from app.core.cache import get_cache
+
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """
-    Simple in-memory sliding window rate limiter for upload endpoints.
-    For production with multiple API replicas, use Redis-backed rate limiting.
+    Sliding window rate limiter for upload endpoints.
+    Uses Redis if available for production deployments, falling back to in-memory.
     """
 
     def __init__(self, app, max_requests: int = 10, window_seconds: int = 60, paths: list = None):
@@ -67,8 +69,44 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         client_ip = request.client.host if request.client else "unknown"
         now = time.time()
+        
+        cache = get_cache()
+        if cache.is_redis:
+            redis_client = cache.client
+            key = f"rate_limit:{request.url.path}:{client_ip}"
+            now_ms = int(now * 1000)
+            window_start = now_ms - (self.window_seconds * 1000)
+            
+            pipeline = redis_client.pipeline()
+            pipeline.zremrangebyscore(key, 0, window_start)
+            pipeline.zcard(key)
+            results = pipeline.execute()
+            
+            count = results[1]
+            if count >= self.max_requests:
+                oldest = redis_client.zrange(key, 0, 0, withscores=True)
+                retry_after = self.window_seconds
+                if oldest:
+                    retry_after = int(self.window_seconds - (now - (oldest[0][1] / 1000.0)))
+                
+                logger.warning(f"Rate limit exceeded (Redis) for {client_ip} on {request.url.path}")
+                return JSONResponse(
+                    status_code=429,
+                    content={
+                        "detail": "Rate limit exceeded. Please wait before submitting another file.",
+                        "retry_after_seconds": max(retry_after, 1)
+                    },
+                    headers={"Retry-After": str(max(retry_after, 1))}
+                )
+                
+            pipeline = redis_client.pipeline()
+            pipeline.zadd(key, {str(now_ms): now_ms})
+            pipeline.expire(key, self.window_seconds)
+            pipeline.execute()
+            
+            return await call_next(request)
 
-        # Clean old entries
+        # Fallback to in-memory sliding window
         self.requests[client_ip] = [
             t for t in self.requests[client_ip]
             if now - t < self.window_seconds
@@ -76,7 +114,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 
         if len(self.requests[client_ip]) >= self.max_requests:
             retry_after = int(self.window_seconds - (now - self.requests[client_ip][0]))
-            logger.warning(f"Rate limit exceeded for {client_ip} on {request.url.path}")
+            logger.warning(f"Rate limit exceeded (In-Memory) for {client_ip} on {request.url.path}")
             return JSONResponse(
                 status_code=429,
                 content={
