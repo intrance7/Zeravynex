@@ -9,5 +9,6 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     google_id = Column(String, unique=True, index=True, nullable=True)
+    github_id = Column(String, unique=True, index=True, nullable=True)
     role = Column(String, default="user")
     created_at = Column(DateTime, default=datetime.utcnow)

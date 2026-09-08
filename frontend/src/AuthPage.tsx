@@ -61,6 +61,8 @@ export default function AuthPage() {
     setIsLoading(true);
     if (provider === 'google') {
       window.location.href = 'http://localhost:8000/api/v1/auth/google/login';
+    } else if (provider === 'github') {
+      window.location.href = 'http://localhost:8000/api/v1/auth/github/login';
     } else {
       setTimeout(() => {
         setIsLoading(false);

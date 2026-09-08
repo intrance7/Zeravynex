@@ -61,6 +61,9 @@ class Settings:
     # === Authentication ===
     GOOGLE_CLIENT_ID: Optional[str] = os.environ.get("GOOGLE_CLIENT_ID")
     GOOGLE_CLIENT_SECRET: Optional[str] = os.environ.get("GOOGLE_CLIENT_SECRET")
+    GITHUB_CLIENT_ID: Optional[str] = os.environ.get("GITHUB_CLIENT_ID")
+    GITHUB_CLIENT_SECRET: Optional[str] = os.environ.get("GITHUB_CLIENT_SECRET")
+    GITHUB_OAUTH_REDIRECT_URI: str = os.environ.get("GITHUB_OAUTH_REDIRECT_URI", "http://localhost:8000/api/v1/auth/github/callback")
     JWT_SECRET: str = os.environ.get("JWT_SECRET", "super-secret-default-key-do-not-use-in-prod")
     JWT_ALGORITHM: str = os.environ.get("JWT_ALGORITHM", "HS256")
     JWT_EXPIRE_MINUTES: int = int(os.environ.get("JWT_EXPIRE_MINUTES", "1440"))
