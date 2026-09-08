@@ -34,7 +34,7 @@ function SuspenseFallback() {
 }
 
 function App() {
-  const { isAuthenticated, login, logout } = useAuthStore();
+  const authStore = useAuthStore();
 
   return (
     <BrowserRouter>
@@ -48,10 +48,10 @@ function App() {
           <Route 
             path="/login" 
             element={
-              isAuthenticated ? (
+              authStore.isAuthenticated ? (
                 <Navigate to="/dashboard" replace />
               ) : (
-                <AuthPage onLogin={() => login({ id: '1', name: 'Admin', email: 'admin@zeravynex.com', role: 'admin' })} />
+                <AuthPage onLogin={() => authStore.login({ id: '1', name: 'Admin', email: 'admin@zeravynex.com', role: 'admin' })} />
               )
             } 
           />
@@ -60,8 +60,8 @@ function App() {
           <Route 
             path="/dashboard" 
             element={
-              isAuthenticated ? (
-                <DashboardLayout onLogout={() => logout()} />
+              authStore.isAuthenticated ? (
+                <DashboardLayout onLogout={() => authStore.logout()} />
               ) : (
                 <Navigate to="/login" replace />
               )
