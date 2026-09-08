@@ -15,6 +15,17 @@ export interface TaskStatusResponse {
   error?: string;
 }
 
+export interface URLAnalysisResponse {
+  status: string;
+  result: {
+    url: string;
+    score: number;
+    verdict: string;
+    severity: string;
+    indicators: string[];
+  };
+}
+
 export const analysisService = {
   analyzeFile: (file: File) => {
     const formData = new FormData();
@@ -29,6 +40,10 @@ export const analysisService = {
       if (!res.ok) throw new Error('Analysis failed');
       return res.json() as Promise<AnalysisResponse>;
     });
+  },
+  
+  analyzeUrl: (url: string) => {
+    return apiClient.post<URLAnalysisResponse>('/analyze/url', { url });
   },
   
   getTaskStatus: (taskId: string) => {

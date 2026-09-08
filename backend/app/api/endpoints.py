@@ -13,6 +13,12 @@ from app.core.cache import get_cache
 from app.core.storage import get_storage_provider
 from app.models.analysis import AnalysisResult
 from app.workers.analysis_task import run_background_analysis
+from pydantic import BaseModel
+from app.engines.url_analyzer import analyze_url_heuristics
+
+class URLAnalysisRequest(BaseModel):
+    url: str
+
 
 logger = logging.getLogger("zeravynex.api")
 settings = get_settings()
@@ -118,6 +124,20 @@ async def analyze_file(
             except Exception:
                 pass
         raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+@router.post("/analyze/url")
+def analyze_url(request: URLAnalysisRequest):
+    """
+    Analyzes a given URL using heuristic rules to detect potential phishing or malicious links.
+    """
+    if not request.url:
+        raise HTTPException(status_code=400, detail="URL cannot be empty.")
+        
+    result = analyze_url_heuristics(request.url)
+    return {
+        "status": "completed",
+        "result": result
+    }
 
 @router.get("/tasks/{task_id}")
 def get_task_status(task_id: str):
