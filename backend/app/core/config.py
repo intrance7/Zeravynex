@@ -7,7 +7,10 @@ import os
 from typing import Optional, List
 from pathlib import Path
 from functools import lru_cache
+from dotenv import load_dotenv
 
+# Load variables from .env file into os.environ
+load_dotenv()
 
 class Settings:
     """Application settings loaded from environment variables with defaults."""
