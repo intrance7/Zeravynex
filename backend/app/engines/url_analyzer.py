@@ -48,7 +48,7 @@ def analyze_url_heuristics(url: str) -> dict:
             score += 30
             
     except Exception as e:
-        indicators.append(f"Failed to parse URL correctly: {str(e)}")
+        indicators.append("Failed to parse URL correctly due to an invalid format.")
         score += 50
         
     # Cap score at 100

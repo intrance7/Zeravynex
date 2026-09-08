@@ -123,7 +123,7 @@ async def analyze_file(
                 os.remove(temp_path)
             except Exception:
                 pass
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Analysis failed due to an internal error.")
 
 @router.post("/analyze/url")
 def analyze_url(request: URLAnalysisRequest):
@@ -156,7 +156,7 @@ def get_task_status(task_id: str):
         elif task_res.state == "SUCCESS":
             return {"status": "completed", "task_id": task_id, "result": task_res.result}
         elif task_res.state == "FAILURE":
-            return {"status": "failed", "task_id": task_id, "error": str(task_res.info)}
+            return {"status": "failed", "task_id": task_id, "error": "Task execution failed."}
         return {"status": task_res.state.lower(), "task_id": task_id}
     except Exception as e:
         return {"status": "completed", "task_id": task_id}
