@@ -10,6 +10,7 @@ import AIAnalystPanel from './AIAnalystPanel';
 import CommandPalette from './CommandPalette';
 import LimitReachedModal from './LimitReachedModal';
 import NotificationCenter from './NotificationCenter';
+import logoUrl from './assets/logo.jpg';
 
 export default function DashboardLayout({ onLogout }: { onLogout: () => void }) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -96,7 +97,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
         {/* Brand */}
         <div>
           <div className="flex items-center gap-3 px-6 h-16 border-b border-border bg-background/30">
-            <Shield className="w-6 h-6 text-primary" />
+            <img src={logoUrl} alt="Zeravynex Logo" className="w-8 h-8 rounded shadow-[0_0_15px_rgba(138,43,226,0.5)] border border-primary/20" />
             <span className="text-lg font-bold tracking-tight text-foreground">
               Zeravynex<span className="text-primary text-xs ml-1 align-top">OS</span>
             </span>
@@ -157,6 +158,7 @@ export default function DashboardLayout({ onLogout }: { onLogout: () => void }) 
             >
               <Menu className="w-5 h-5" />
             </button>
+            <img src={logoUrl} alt="Logo" className="w-6 h-6 rounded border border-primary/20 shadow-sm ml-1" />
           </div>
 
           {/* Search Bar */}
