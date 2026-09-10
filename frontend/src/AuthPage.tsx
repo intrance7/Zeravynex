@@ -5,6 +5,7 @@ import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
 import { useAuthStore } from './store/authStore';
 import { apiClient } from './services/apiClient';
+import logoUrl from './assets/logo.jpg';
 
 export default function AuthPage() {
   const [authState, setAuthState] = useState<'login' | 'register' | 'forgot' | 'verify'>('login');
@@ -110,9 +111,7 @@ export default function AuthPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex flex-col items-center mb-8"
         >
-          <div className="w-12 h-12 rounded-xl bg-transparent border border-border/50 shadow-sm flex items-center justify-center mb-4 text-foreground">
-            <Shield className="w-6 h-6 stroke-[1.5]" />
-          </div>
+          <img src={logoUrl} alt="Zeravynex Logo" className="w-16 h-16 rounded-2xl mb-4 border border-border/50 shadow-[0_0_20px_rgba(138,43,226,0.3)]" />
           <h1 className="text-xl font-bold tracking-[0.2em] uppercase mb-3">Zeravynex</h1>
           <div className="px-4 py-1.5 rounded-full bg-muted/40 border border-border/30 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
             Malware Analysis & Threat Intelligence

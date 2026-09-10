@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ChevronRight, Network, Shield } from 'lucide-react';
+import logoUrl from './assets/logo.jpg';
 
 const Logo = ({ className = "" }: { className?: string }) => (
-  <Shield className={`text-white ${className}`} />
+  <img src={logoUrl} alt="Logo" className={`rounded shadow-[0_0_10px_rgba(138,43,226,0.3)] ${className}`} />
 );
 
 const Preloader = ({ onComplete }: { onComplete: () => void }) => {
