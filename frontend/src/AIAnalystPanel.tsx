@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  X, Send, Sparkles, BrainCircuit, Bot, User, 
+import {
+  X, Send, Sparkles, BrainCircuit, Bot, User,
   Activity, ArrowRight
 } from 'lucide-react';
 import { cn } from './lib/utils';
@@ -39,13 +40,8 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  useEffect(() => {
-    if (isOpen && initialPrompt) {
-       handleSend(initialPrompt);
-    }
-  }, [isOpen, initialPrompt]);
 
-  const handleSend = (text: string = inputValue) => {
+  const handleSend = useCallback((text: string = inputValue) => {
     if (!text.trim()) return;
 
     // Add user message
@@ -105,12 +101,18 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
       }
 
       setMessages(prev => [
-        ...prev, 
+        ...prev,
         { id: (Date.now() + 1).toString(), sender: 'ai', content: aiContent, evidence }
       ]);
       setIsTyping(false);
     }, 1200);
-  };
+  }, [inputValue]);
+
+  useEffect(() => {
+    if (isOpen && initialPrompt) {
+      handleSend(initialPrompt);
+    }
+  }, [isOpen, initialPrompt, handleSend]);
 
   const quickPrompts = [
     "Explain Verdict",
@@ -157,7 +159,7 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
                   </div>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-2 rounded-md hover:bg-muted text-muted-foreground transition-colors"
               >
@@ -171,13 +173,13 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
                 <div key={msg.id} className={cn("flex gap-3", msg.sender === 'user' ? "flex-row-reverse" : "")}>
                   <div className={cn(
                     "w-7 h-7 rounded flex items-center justify-center shrink-0 border",
-                    msg.sender === 'user' 
-                      ? "bg-muted border-border" 
+                    msg.sender === 'user'
+                      ? "bg-muted border-border"
                       : "bg-primary/10 border-primary/20 text-primary"
                   )}>
                     {msg.sender === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
                   </div>
-                  
+
                   <div className={cn(
                     "max-w-[85%] space-y-3",
                     msg.sender === 'user' ? "items-end" : "items-start"
@@ -217,7 +219,7 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
                   </div>
                 </div>
               ))}
-              
+
               {isTyping && (
                 <div className="flex gap-3">
                   <div className="w-7 h-7 rounded bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
