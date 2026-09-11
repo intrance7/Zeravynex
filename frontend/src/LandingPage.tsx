@@ -184,6 +184,15 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={!loading ? { opacity: 1, y: 0 } : {}}
             viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.1 }}
+            className="flex justify-center mb-8"
+          >
+            <Logo className="w-20 h-20 md:w-24 md:h-24 rounded-2xl shadow-[0_0_30px_rgba(138,43,226,0.4)]" />
+          </motion.div>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={!loading ? { opacity: 1, y: 0 } : {}}
+            viewport={{ once: true }}
             transition={{ duration: 1, delay: 0.2 }}
             className="text-[10px] font-mono text-white/50 mb-8 tracking-[0.4em] uppercase"
           >
