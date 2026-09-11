@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useCallback } from 'react';
 import { Database, Search, ChevronLeft, ChevronRight, Activity, ShieldAlert, CheckCircle, AlertTriangle, ExternalLink, Filter, Download, Tags, Trash2, CheckSquare, Square } from 'lucide-react';
 import { cn } from './lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -27,41 +28,42 @@ export default function HistoryContent() {
   const limit = 15;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchHistory();
-  }, [page]);
+  
+  const generateMockHistory = useCallback(() => {
+  const mockData = Array.from({ length: 15 }).map((_, i) => ({
+    id: `mock-${i}-${Date.now()}`,
+    sha256: Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join(''),
+    file_name: `sample_${i}.exe`,
+    risk_score: Math.random() * 100,
+    verdict: Math.random() > 0.7 ? 'CRITICAL' : Math.random() > 0.4 ? 'SUSPICIOUS' : 'CLEAN / LOW RISK',
+    created_at: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
+    architecture: Math.random() > 0.5 ? 'x64' : 'x86',
+    file_type: 'PE32',
+    tags: Math.random() > 0.5 ? ['APT', 'Ransomware'] : []
+  }));
+  setHistory(mockData);
+}, []);
 
-  const fetchHistory = async () => {
-    setLoading(true);
-    try {
-      const data = await historyService.getHistory(page, limit);
-      if (data && Array.isArray(data)) {
-        setHistory(data);
-      } else {
-        generateMockHistory();
-      }
-    } catch (err) {
-      console.error("Failed to load history:", err);
+const fetchHistory = useCallback(async () => {
+  setLoading(true);
+  try {
+    const data = await historyService.getHistory(page, limit);
+    if (data && Array.isArray(data)) {
+      setHistory(data);
+    } else {
       generateMockHistory();
-    } finally {
-      setLoading(false);
     }
-  };
-
-  const generateMockHistory = () => {
-    const mockData = Array.from({ length: 15 }).map((_, i) => ({
-      id: `mock-${i}-${Date.now()}`,
-      sha256: Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join(''),
-      file_name: `sample_${i}.exe`,
-      risk_score: Math.random() * 100,
-      verdict: Math.random() > 0.7 ? 'CRITICAL' : Math.random() > 0.4 ? 'SUSPICIOUS' : 'CLEAN / LOW RISK',
-      created_at: new Date(Date.now() - Math.random() * 10000000000).toISOString(),
-      architecture: Math.random() > 0.5 ? 'x64' : 'x86',
-      file_type: 'PE32',
-      tags: Math.random() > 0.5 ? ['APT', 'Ransomware'] : []
-    }));
-    setHistory(mockData);
+  } catch (err) {
+    console.error("Failed to load history:", err);
+    generateMockHistory();
+  } finally {
+    setLoading(false);
   }
+}, [page, generateMockHistory]);
+
+useEffect(() => {
+  fetchHistory();
+}, [fetchHistory]);
 
   const getVerdictStyles = (v: string) => {
     if (v === 'CLEAN / LOW RISK') return { color: 'text-success', bg: 'bg-success/10', border: 'border-success/30', icon: <CheckCircle className="w-3.5 h-3.5 text-success" /> };

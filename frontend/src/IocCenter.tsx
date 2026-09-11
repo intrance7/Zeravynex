@@ -40,7 +40,7 @@ export default function IocCenter({ iocs }: IocCenterProps) {
     });
   };
 
-  const iocData = iocs || {};
+  const iocData = useMemo(() => iocs || {}, [iocs]);
 
   const totalIocs = useMemo(() => {
     return IOC_TYPES.reduce((acc, type) => acc + (iocData[type.key]?.length || 0), 0);
