@@ -108,9 +108,16 @@ export default function AIAnalystPanel({ isOpen, onClose, initialPrompt }: AIAna
     }, 1200);
   }, [inputValue]);
 
+  const processedPrompt = useRef<string | null>(null);
+
   useEffect(() => {
-    if (isOpen && initialPrompt) {
+    if (isOpen && initialPrompt && processedPrompt.current !== initialPrompt) {
       handleSend(initialPrompt);
+      processedPrompt.current = initialPrompt;
+    }
+
+    if (!isOpen) {
+      processedPrompt.current = null;
     }
   }, [isOpen, initialPrompt, handleSend]);
 

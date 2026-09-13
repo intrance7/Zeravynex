@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import EmptyState from './EmptyState';
 import { historyService } from './services/historyService';
 
+const limit = 15;
+
 export default function HistoryContent() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function HistoryContent() {
     minScore: 0
   });
 
-  const limit = 15;
+  
   const navigate = useNavigate();
 
   
