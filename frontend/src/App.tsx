@@ -34,7 +34,7 @@ function SuspenseFallback() {
 }
 
 function App() {
-  const { isAuthenticated, login, logout } = useAuthStore();
+  const { isAuthenticated, logout } = useAuthStore();
 
   return (
     <BrowserRouter>
