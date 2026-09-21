@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Eye, EyeOff, CheckCircle2, HelpCircle, Activity } from 'lucide-react';
+import { Eye, EyeOff, CheckCircle2, HelpCircle, Activity } from 'lucide-react';
 import { Button } from './components/ui/Button';
 import { Input } from './components/ui/Input';
 import { useAuthStore } from './store/authStore';

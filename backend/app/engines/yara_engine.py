@@ -81,6 +81,9 @@ class YARAEngine:
                         "severity": meta.get("severity", "MEDIUM"),
                         "category": meta.get("category", "General"),
                         "description": meta.get("description", ""),
+                        "author": meta.get("author", "Zeravynex Security Team"),
+                        "reference": meta.get("reference", ""),
+                        "mitre_attack_id": meta.get("mitre_attack_id", ""),
                         "matched_strings": string_instances
                     })
             except Exception as e:
@@ -97,7 +100,7 @@ class YARAEngine:
         }
 
     def _fallback_pattern_scan(self, file_path: Path) -> List[Dict[str, Any]]:
-        """Fallback pattern scanner matching UPX signatures, process injection strings, and ransom notes."""
+        """Fallback pattern scanner matching UPX signatures, process injection strings, cryptominers, infostealers, and ransomware."""
         matches = []
         try:
             with open(file_path, "rb") as f:
@@ -114,6 +117,9 @@ class YARAEngine:
                     "severity": "MEDIUM",
                     "category": "Packer",
                     "description": "Detects UPX packed executable binaries",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://attack.mitre.org/techniques/T1027/002/",
+                    "mitre_attack_id": "T1027.002",
                     "matched_strings": [{"identifier": "$upx", "offset": "0x0", "matched_text": "UPX0/UPX1"}]
                 })
 
@@ -126,19 +132,86 @@ class YARAEngine:
                     "severity": "HIGH",
                     "category": "Process Injection",
                     "description": "Detects WinAPI imports commonly used together for process injection",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://attack.mitre.org/techniques/T1055/",
+                    "mitre_attack_id": "T1055",
                     "matched_strings": [{"identifier": "$injection", "offset": "0x0", "matched_text": "VirtualAllocEx+WriteProcessMemory+CreateRemoteThread"}]
                 })
 
-            # Check Ransomware strings
-            if re.search(r"vssadmin delete shadows|YOUR FILES HAVE BEEN ENCRYPTED", content_text, re.IGNORECASE):
+            # Check Cryptominer (XMRig / Stratum)
+            if ("stratum+tcp://" in content_text.lower() or "stratum+ssl://" in content_text.lower()) and ("--donate-level=" in content_text or "randomx" in content_text.lower() or "cryptonight" in content_text.lower()):
                 matches.append({
-                    "rule": "Generic_Ransomware_Indicators",
+                    "rule": "Cryptominer_XMRig_CoinMiner",
                     "namespace": "malware_families",
-                    "tags": ["ransomware"],
+                    "tags": ["cryptominer", "xmrig", "stratum", "monero"],
+                    "severity": "HIGH",
+                    "category": "Cryptominer",
+                    "description": "Detects XMRig cryptocurrency miner variants, RandomX/CryptoNight algorithms, and Stratum mining telemetry",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://github.com/xmrig/xmrig",
+                    "mitre_attack_id": "T1496",
+                    "matched_strings": [{"identifier": "$xmrig", "offset": "0x0", "matched_text": "Stratum+XMRig Indicator"}]
+                })
+
+            # Check RedLine Stealer
+            if "IRemoteEndpoint" in content_text and ("\\Google\\Chrome\\User Data" in content_text or "logins.json" in content_text or "nkbihfbeogaeaoehlefnkodbefgpgknn" in content_text):
+                matches.append({
+                    "rule": "Infostealer_RedLine",
+                    "namespace": "malware_families",
+                    "tags": ["infostealer", "redline", "credentials", "wallets"],
+                    "severity": "CRITICAL",
+                    "category": "Infostealer",
+                    "description": "Detects RedLine Stealer .NET infostealer targeting browser credentials, crypto wallets, and WCF C2 endpoints",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://malpedia.caad.fkie.fraunhofer.de/details/win.redline_stealer",
+                    "mitre_attack_id": "T1555",
+                    "matched_strings": [{"identifier": "$redline", "offset": "0x0", "matched_text": "RedLine WCF+Target Indicator"}]
+                })
+
+            # Check LummaC2 Stealer
+            if ("profile_id=" in content_text.lower() or "action=get_data" in content_text.lower()) and ("\\AppData\\Local\\Google\\Chrome" in content_text or "egjidjbpglichdcondbcbdnbeeppgdph" in content_text):
+                matches.append({
+                    "rule": "Infostealer_LummaC2",
+                    "namespace": "malware_families",
+                    "tags": ["infostealer", "lummac2", "lumma", "credentials"],
+                    "severity": "CRITICAL",
+                    "category": "Infostealer",
+                    "description": "Detects LummaC2 (Lumma Stealer) native infostealer binary artifacts and exfiltration telemetry",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://malpedia.caad.fkie.fraunhofer.de/details/win.lumma",
+                    "mitre_attack_id": "T1005",
+                    "matched_strings": [{"identifier": "$lumma", "offset": "0x0", "matched_text": "Lumma Telemetry+Target Indicator"}]
+                })
+
+            # Check Ransomware Extortion Note
+            if re.search(r"YOUR FILES HAVE BEEN ENCRYPTED|your files are encrypted", content_text, re.IGNORECASE) and (".onion" in content_text.lower() or "tor browser" in content_text.lower() or "decryptor" in content_text.lower()):
+                matches.append({
+                    "rule": "Ransomware_Extortion_Note",
+                    "namespace": "malware_families",
+                    "tags": ["ransomware", "ransom_note", "extortion"],
                     "severity": "CRITICAL",
                     "category": "Ransomware",
-                    "description": "Detects typical ransomware ransom notes and shadow copy deletion commands",
-                    "matched_strings": [{"identifier": "$ransom", "offset": "0x0", "matched_text": "Ransomware indicator match"}]
+                    "description": "Detects typical ransomware ransom notes, onion payment portals, and extortion contact markers",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://attack.mitre.org/techniques/T1486/",
+                    "mitre_attack_id": "T1486",
+                    "matched_strings": [{"identifier": "$ransom_note", "offset": "0x0", "matched_text": "Extortion note + onion/tor portal"}]
+                })
+
+            # Check Inhibit Recovery / Sabotage
+            recovery_sabotage_hits = sum(1 for cmd in ["vssadmin delete shadows", "bcdedit", "wbadmin delete catalog", "wmic shadowcopy delete"] if cmd in content_text.lower())
+            if recovery_sabotage_hits >= 2:
+                matches.append({
+                    "rule": "Ransomware_Inhibit_System_Recovery",
+                    "namespace": "malware_families",
+                    "tags": ["ransomware", "vssadmin", "bcdedit", "recovery_sabotage"],
+                    "severity": "CRITICAL",
+                    "category": "Ransomware",
+                    "description": "Detects bundled system recovery sabotage commands used by ransomware to inhibit shadow copies and recovery",
+                    "author": "Zeravynex Security Team",
+                    "reference": "https://attack.mitre.org/techniques/T1490/",
+                    "mitre_attack_id": "T1490",
+                    "matched_strings": [{"identifier": "$recovery_sabotage", "offset": "0x0", "matched_text": "Shadow copy / boot recovery suppression"}]
                 })
         except Exception:
             pass

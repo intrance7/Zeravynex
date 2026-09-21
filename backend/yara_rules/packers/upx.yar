@@ -1,6 +1,9 @@
 rule UPX_Packed_Binary {
     meta:
+        author = "Zeravynex Security Team"
         description = "Detects UPX packed executable binaries"
+        reference = "https://attack.mitre.org/techniques/T1027/002/"
+        mitre_attack_id = "T1027.002"
         category = "Packer"
         severity = "MEDIUM"
         namespace = "packers"

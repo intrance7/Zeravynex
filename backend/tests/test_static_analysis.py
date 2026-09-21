@@ -260,3 +260,150 @@ def test_cli_help_text(capsys):
     assert "Examples:" in captured.out
 
 
+# =====================================================================
+# YARA RULES EXPANSION & SPECIFICITY TEST SUITE
+# =====================================================================
+
+def test_yara_rule_metadata_conformance():
+    """Verify that all .yar files compile and strictly adhere to the required metadata schema."""
+    engine = YARAEngine()
+    if not engine.compiled_rules:
+        pytest.skip("Native YARA compiler not available in current environment")
+
+    # Inspect compiled rules metadata
+    for rule in engine.compiled_rules:
+        meta = rule.meta
+        rule_name = rule.identifier
+        assert "author" in meta, f"Rule '{rule_name}' missing mandatory 'author' metadata"
+        assert "description" in meta, f"Rule '{rule_name}' missing mandatory 'description' metadata"
+        assert "reference" in meta, f"Rule '{rule_name}' missing mandatory 'reference' metadata"
+        assert "mitre_attack_id" in meta, f"Rule '{rule_name}' missing mandatory 'mitre_attack_id' metadata"
+        assert "category" in meta, f"Rule '{rule_name}' missing mandatory 'category' metadata"
+        assert "severity" in meta, f"Rule '{rule_name}' missing mandatory 'severity' metadata"
+        assert meta["mitre_attack_id"].startswith("T"), f"Invalid MITRE ATT&CK ID in '{rule_name}': {meta['mitre_attack_id']}"
+
+
+def test_yara_cryptominer_detection(tmp_path):
+    """Verify positive detection of XMRig cryptominer signatures with full metadata."""
+    miner_binary = tmp_path / "xmrig_sample.exe"
+    # Construct synthetic PE with Stratum protocol + XMRig config markers
+    content = (
+        b"MZ" + b"\x00" * 20000 +
+        b"stratum+tcp://pool.supportxmr.com:3333\x00" +
+        b"--donate-level=1\x00" +
+        b"--cpu-max-threads-hint=100\x00" +
+        b"randomx_init_cache\x00"
+    )
+    miner_binary.write_bytes(content)
+
+    engine = YARAEngine()
+    scan_res = engine.scan_file(miner_binary)
+    matched_rules = [m["rule"] for m in scan_res["matches"]]
+
+    assert "Cryptominer_XMRig_CoinMiner" in matched_rules
+    xmrig_match = next(m for m in scan_res["matches"] if m["rule"] == "Cryptominer_XMRig_CoinMiner")
+    assert xmrig_match["category"] == "Cryptominer"
+    assert xmrig_match["mitre_attack_id"] == "T1496"
+    assert xmrig_match["severity"] == "HIGH"
+    assert "author" in xmrig_match
+    assert "reference" in xmrig_match
+
+
+def test_yara_infostealer_redline_detection(tmp_path):
+    """Verify positive detection of RedLine Infostealer signatures."""
+    redline_binary = tmp_path / "redline_sample.exe"
+    content = (
+        b"MZ" + b"\x00" * 16000 +
+        b"IRemoteEndpoint\x00" +
+        b"SELECT * FROM Win32_OperatingSystem\x00" +
+        b"\\Google\\Chrome\\User Data\x00" +
+        b"logins.json\x00" +
+        b"nkbihfbeogaeaoehlefnkodbefgpgknn\x00"
+    )
+    redline_binary.write_bytes(content)
+
+    engine = YARAEngine()
+    scan_res = engine.scan_file(redline_binary)
+    matched_rules = [m["rule"] for m in scan_res["matches"]]
+
+    assert "Infostealer_RedLine" in matched_rules
+    match = next(m for m in scan_res["matches"] if m["rule"] == "Infostealer_RedLine")
+    assert match["category"] == "Infostealer"
+    assert match["mitre_attack_id"] == "T1555"
+    assert match["severity"] == "CRITICAL"
+
+
+def test_yara_infostealer_lummac2_detection(tmp_path):
+    """Verify positive detection of LummaC2 Infostealer signatures."""
+    lumma_binary = tmp_path / "lumma_sample.exe"
+    content = (
+        b"MZ" + b"\x00" * 12000 +
+        b"profile_id=lumma_test_target\x00" +
+        b"build_id=2026_09\x00" +
+        b"\\AppData\\Local\\Google\\Chrome\x00"
+    )
+    lumma_binary.write_bytes(content)
+
+    engine = YARAEngine()
+    scan_res = engine.scan_file(lumma_binary)
+    matched_rules = [m["rule"] for m in scan_res["matches"]]
+
+    assert "Infostealer_LummaC2" in matched_rules
+    match = next(m for m in scan_res["matches"] if m["rule"] == "Infostealer_LummaC2")
+    assert match["category"] == "Infostealer"
+    assert match["mitre_attack_id"] == "T1005"
+    assert match["severity"] == "CRITICAL"
+
+
+def test_yara_ransomware_note_and_sabotage_detection(tmp_path):
+    """Verify positive detection of enhanced ransomware extortion notes and recovery sabotage."""
+    ransom_binary = tmp_path / "ransom_sample.exe"
+    content = (
+        b"MZ" + b"\x00" * 10000 +
+        b"YOUR FILES HAVE BEEN ENCRYPTED\x00" +
+        b"http://lock54example.onion/portal\x00" +
+        b"Download Tor Browser to pay bitcoin\x00" +
+        b"vssadmin delete shadows\x00" +
+        b"bcdedit /set {default} recoveryenabled no\x00"
+    )
+    ransom_binary.write_bytes(content)
+
+    engine = YARAEngine()
+    scan_res = engine.scan_file(ransom_binary)
+    matched_rules = [m["rule"] for m in scan_res["matches"]]
+
+    assert "Ransomware_Extortion_Note" in matched_rules
+    assert "Ransomware_Inhibit_System_Recovery" in matched_rules
+    extortion_match = next(m for m in scan_res["matches"] if m["rule"] == "Ransomware_Extortion_Note")
+    assert extortion_match["mitre_attack_id"] == "T1486"
+    assert extortion_match["category"] == "Ransomware"
+
+
+def test_yara_false_positive_resistance(tmp_path):
+    """Verify that benign files and partial/ambiguous string matches do NOT trigger false positives."""
+    engine = YARAEngine()
+
+    # Case 1: Pure Benign Executable (standard strings, no threat markers)
+    clean_binary = tmp_path / "clean_calc.exe"
+    clean_binary.write_bytes(b"MZ" + b"\x00" * 15000 + b"Calculator Application\x00Copyright 2026\x00")
+    res_clean = engine.scan_file(clean_binary)
+    assert res_clean["total_matches"] == 0, f"False positive triggered on clean binary: {res_clean['matches']}"
+
+    # Case 2: Ambiguous / Isolated Keywords (must NOT trigger without required conjunctions)
+    ambiguous_binary = tmp_path / "admin_utility.exe"
+    ambiguous_binary.write_bytes(
+        b"MZ" + b"\x00" * 15000 +
+        b"This documentation discusses Monero mining and shadow copies.\x00" +
+        b"Only single isolated keyword: stratum+tcp://\x00" +
+        b"Single keyword: vssadmin delete shadows\x00"
+    )
+    res_ambig = engine.scan_file(ambiguous_binary)
+    # Ensure neither Cryptominer nor Ransomware note triggers on partial text
+    matched_ambig = [m["rule"] for m in res_ambig["matches"]]
+    assert "Cryptominer_XMRig_CoinMiner" not in matched_ambig
+    assert "Ransomware_Extortion_Note" not in matched_ambig
+    assert "Infostealer_RedLine" not in matched_ambig
+    assert "Infostealer_LummaC2" not in matched_ambig
+
+
+

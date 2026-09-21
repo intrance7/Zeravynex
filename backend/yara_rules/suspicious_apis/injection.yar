@@ -1,6 +1,9 @@
 rule Process_Injection_Primitives {
     meta:
+        author = "Zeravynex Security Team"
         description = "Detects WinAPI imports commonly used together for process injection"
+        reference = "https://attack.mitre.org/techniques/T1055/"
+        mitre_attack_id = "T1055"
         category = "Process Injection"
         severity = "HIGH"
         namespace = "suspicious_apis"
